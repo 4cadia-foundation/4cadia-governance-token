@@ -1,0 +1,26 @@
+{
+  "name": "4cadia.governance.token",
+  "version": "1.0.0",
+  "description": "4Cadia Goverance Token, project 4GT",
+  "main": "index.js",
+  "scripts": {
+    "test": "truffle test",
+    "compile": "truffle compile",
+    "migrate": "truffle migrate"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/janusplatform/4cadia.governance.token.git"
+  },
+  "keywords": [
+    "token",
+    "4GT",
+    "truffle"
+  ],
+  "author": "Paulo Gabriel",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/janusplatform/4cadia.governance.token#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^2.3.0"
+  }
+}

@@ -27,7 +27,7 @@ contract('FGToken', acounts => {
 
         it('has the correct decimals',async () => {
            const decimals = await this.token.decimals();
-           assert.equal(decimals, _decimals, 'bla')
+           assert.equal(decimals, _decimals)
         });
 
     });

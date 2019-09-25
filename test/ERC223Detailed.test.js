@@ -7,9 +7,10 @@ contract('FGToken', acounts => {
     const _name =  'FGToken';
     const _symbol = 'FGT';
     const _decimals = 8;
+    const _initialSupply = 0;
 
     beforeEach(async () => {
-        this.token = await FGToken.new(_name, _symbol, _decimals);
+        this.token = await FGToken.new(_name, _symbol, _decimals, _initialSupply);
     });
 
     describe('Token Attributes', () => {

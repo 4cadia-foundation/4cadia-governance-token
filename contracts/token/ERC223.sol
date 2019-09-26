@@ -34,6 +34,9 @@ contract ERC223Token is IERC223 {
     function transfer(address _to, uint _value, bytes memory _data) public returns (bool success){
         // Standard function transfer similar to ERC20 transfer with no _data .
         // Added due to backwards compatibility reasons .
+        
+        if (balances[msg.sender] < _value) revert("Insuficient funds");
+
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);
         if(Address.isContract(_to)) {
@@ -54,6 +57,9 @@ contract ERC223Token is IERC223 {
      * @param _value Amount of tokens that will be transferred.
      */
     function transfer(address _to, uint _value) public returns (bool success){
+        
+        if (balances[msg.sender] < _value) revert("Insuficient funds");
+
         bytes memory empty = hex"00000000";
         balances[msg.sender] = balances[msg.sender].sub(_value);
         balances[_to] = balances[_to].add(_value);

@@ -78,7 +78,23 @@ contract('FGToken', accounts => {
             expect(Number(await balanceContract.value())).to.equal(_value);
         });
 
-    });
+        it('should revert operation, insuficient funds for transfer without _data param', async () => {
+            const _to = accounts[1];
+            const balance = await this.token.balanceOf(accounts[0]);
+            const _value = _initialSupply + 500;
+            await truffleAssertions.reverts(this.token.transfer(_to, _value), 'Insuficient funds');         
+            expect(balance.toNumber()).to.equal(_initialSupply);
+        });
 
+        it('should revert operation, insuficient funds for transfer with _data param', async () => {
+            const _to = accounts[1];
+            const _data = new Uint8Array([83,97,109,112,108,101,32,68,97,116,97]);
+            const balance = await this.token.balanceOf(accounts[0]);
+            const _value = _initialSupply + 500;
+            await truffleAssertions.reverts(this.token.transfer(_to, _value, _data), 'Insuficient funds');         
+            expect(balance.toNumber()).to.equal(_initialSupply);
+        });
+      
+    });
 
 });

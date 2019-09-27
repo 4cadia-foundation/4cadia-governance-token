@@ -106,4 +106,14 @@ contract ERC223Token is IERC223 {
         return _allowances[owner][spender];
     }
 
+    function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
+        _approve(msg.sender, spender, _allowances[msg.sender][spender].add(addedValue));
+        return true;
+    }
+
+    function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
+        _approve(msg.sender, spender, _allowances[msg.sender][spender].sub(subtractedValue));
+        return true;
+    }
+
 }

@@ -27,6 +27,20 @@ contract('FGToken', accounts => {
             await truffleAssertions.passes(this.token.transfer(_to, _value));            
         });
 
+        it('should make transfer between accounts[1] and accounts[2], with success', async () => {
+            await this.token.transfer(accounts[1], 500);
+            await this.token.transfer(accounts[2], 200, { from: accounts[1] });
+            
+            const balanceOwner = await this.token.balanceOf(accounts[0]);
+            const balanceA = await this.token.balanceOf(accounts[1]);
+            const balanceB = await this.token.balanceOf(accounts[2]);
+            
+            assert.equal(balanceA.toNumber(), 300 , 'accounts[1] balance is wrong');
+            assert.equal(balanceB.toNumber(), 200 , 'accounts[2] balance is wrong');
+            assert.equal(balanceOwner.toNumber(), 500 , 'accounts[0] balance is wrong');
+
+        });
+
         it("should transfer value of address owner for other account", async () => {
             const _to = accounts[1];
             const _value = 500;
@@ -78,7 +92,23 @@ contract('FGToken', accounts => {
             expect(Number(await balanceContract.value())).to.equal(_value);
         });
 
-    });
+        it('should revert operation, insuficient funds for transfer without _data param', async () => {
+            const _to = accounts[1];
+            const balance = await this.token.balanceOf(accounts[0]);
+            const _value = _initialSupply + 500;
+            await truffleAssertions.reverts(this.token.transfer(_to, _value), 'Insuficient funds');         
+            expect(balance.toNumber()).to.equal(_initialSupply);
+        });
 
+        it('should revert operation, insuficient funds for transfer with _data param', async () => {
+            const _to = accounts[1];
+            const _data = new Uint8Array([83,97,109,112,108,101,32,68,97,116,97]);
+            const balance = await this.token.balanceOf(accounts[0]);
+            const _value = _initialSupply + 500;
+            await truffleAssertions.reverts(this.token.transfer(_to, _value, _data), 'Insuficient funds');         
+            expect(balance.toNumber()).to.equal(_initialSupply);
+        });
+      
+    });
 
 });

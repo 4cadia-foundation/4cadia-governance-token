@@ -45,17 +45,14 @@ contract ERC223Mintable is ERC223Token {
         _minters[account] = false;
         emit MinterRemoved(account);
     }
-    /**
-     * @dev See {ERC20-_mint}.
-     *
-     * Requirements:
-     *
-     * - the caller must have the {MinterRole}.
-     */
+   
+   
     function mint(address account, uint256 amount) public onlyMinter returns (bool) {
         require(account != address(0), "ERC20: mint to the zero address");
+    
         _totalSupply = _totalSupply.add(amount);
         balances[account] = balances[account].add(amount);
         return true;
     }
+
 }

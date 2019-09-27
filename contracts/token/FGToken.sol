@@ -12,12 +12,11 @@ contract FGToken is ERC223Mintable ,ERC223Detailed {
     }
 
     function mint(address account, uint256 amount) public onlyMinter returns (bool) {
-        
         require(account != address(0), "ERC20: mint to the zero address");
         _totalSupply = _totalSupply.add(amount);
         balances[account] = balances[account].add(amount);
-        
         return true;
     }
+
 
 }

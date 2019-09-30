@@ -4,10 +4,12 @@ import "./IERC223.sol";
 import "./IERC223Recipient.sol";
 import "../math/SafeMath.sol";
 import "../utils/Address.sol";
+import "@openzeppelin/contracts/lifecycle/Pausable.sol";
+
 /**
  * @title Reference implementation of the ERC223 standard token.
  */
-contract ERC223Token is IERC223 {
+contract ERC223Token is IERC223, Pausable {
 
     using SafeMath for uint;
 
@@ -27,12 +29,12 @@ contract ERC223Token is IERC223 {
         return _totalSupply;
     }
 
-    function transfer(address _to, uint _value, bytes memory _data) public returns (bool success){
+    function transfer(address _to, uint _value, bytes memory _data) public whenNotPaused returns (bool success){
          _transfer(msg.sender, _to, _value, _data);
         return true;
     }
 
-    function transfer(address _to, uint _value) public returns (bool success){
+    function transfer(address _to, uint _value) public whenNotPaused returns (bool success){
         bytes memory empty = hex"00000000";
         _transfer(msg.sender, _to, _value, empty);
         return true;
@@ -52,7 +54,7 @@ contract ERC223Token is IERC223 {
         emit Transfer(sender, _to, _value, _data);
     }
 
-    function approve(address spender, uint256 value) public returns (bool) {
+    function approve(address spender, uint256 value) public whenNotPaused returns (bool) {
         _approve(msg.sender, spender, value);
         return true;
     }
@@ -66,7 +68,7 @@ contract ERC223Token is IERC223 {
         emit Approval(owner, spender, value);
     }
 
-    function transferFrom(address _sender, address _to, uint256 _amount) public returns (bool) {
+    function transferFrom(address _sender, address _to, uint256 _amount) public whenNotPaused returns (bool) {
         bytes memory empty = hex"00000000";
         _transfer(_sender, _to, _amount, empty);
         _approve(_sender, msg.sender, _allowances[_sender][msg.sender].sub(_amount));
@@ -77,18 +79,18 @@ contract ERC223Token is IERC223 {
         return _allowances[owner][spender];
     }
 
-    function increaseAllowance(address spender, uint256 addedValue) public returns (bool) {
+    function increaseAllowance(address spender, uint256 addedValue) public whenNotPaused returns (bool) {
         _approve(msg.sender, spender, _allowances[msg.sender][spender].add(addedValue));
         return true;
     }
 
-    function decreaseAllowance(address spender, uint256 subtractedValue) public returns (bool) {
+    function decreaseAllowance(address spender, uint256 subtractedValue) public whenNotPaused returns (bool) {
         _approve(msg.sender, spender, _allowances[msg.sender][spender].sub(subtractedValue));
         return true;
     }
 
 
-    function burn(uint256 _value) public {
+    function burn(uint256 _value) public whenNotPaused {
         _burn(msg.sender, _value);
     }
 

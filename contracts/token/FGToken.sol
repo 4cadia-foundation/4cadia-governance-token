@@ -19,4 +19,5 @@ contract FGToken is ERC223Mintable ,ERC223Detailed {
     }
 
 
+
 }

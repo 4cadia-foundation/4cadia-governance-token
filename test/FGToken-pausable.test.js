@@ -53,8 +53,4 @@ contract('FGToken', accounts => {
         });
 
     });
-
-
-    
-
 });

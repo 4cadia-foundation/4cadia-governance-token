@@ -11,42 +11,27 @@ contract ERC223Token is IERC223 {
 
     using SafeMath for uint;
 
-    /**
-     * @dev See `IERC223.totalSupply`.
-     */
+    event Burn(address indexed burner, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+
+    mapping(address => uint) balances; // List of user balances.
+    mapping (address => mapping (address => uint256)) private _allowances;
+
+
+
+    function balanceOf(address _owner) public view returns (uint balance) {
+        return balances[_owner];
+    }
+
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
 
-    mapping(address => uint) balances; // List of user balances.
-
-    mapping (address => mapping (address => uint256)) private _allowances;
-
-    /**
-     * @dev Transfer the specified amount of tokens to the specified address.
-     *      Invokes the `tokenFallback` function if the recipient is a contract.
-     *      The token transfer fails if the recipient is a contract
-     *      but does not implement the `tokenFallback` function
-     *      or the fallback function to receive funds.
-     *
-     * @param _to    Receiver address.
-     * @param _value Amount of tokens that will be transferred.
-     * @param _data  Transaction metadata.
-     */
     function transfer(address _to, uint _value, bytes memory _data) public returns (bool success){
          _transfer(msg.sender, _to, _value, _data);
         return true;
     }
 
-    /**
-     * @dev Transfer the specified amount of tokens to the specified address.
-     *      This function works the same with the previous one
-     *      but doesn't contain `_data` param.
-     *      Added due to backwards compatibility reasons.
-     *
-     * @param _to    Receiver address.
-     * @param _value Amount of tokens that will be transferred.
-     */
     function transfer(address _to, uint _value) public returns (bool success){
         bytes memory empty = hex"00000000";
         _transfer(msg.sender, _to, _value, empty);
@@ -66,20 +51,6 @@ contract ERC223Token is IERC223 {
         }
         emit Transfer(sender, _to, _value, _data);
     }
-
-    /**
-     * @dev Returns balance of the `_owner`.
-     *
-     * @param _owner   The address whose balance will be returned.
-     * @return balance Balance of the `_owner`.
-     */
-    function balanceOf(address _owner) public view returns (uint balance) {
-        return balances[_owner];
-    }
-
-
-
-    event Approval(address indexed owner, address indexed spender, uint256 value);
 
     function approve(address spender, uint256 value) public returns (bool) {
         _approve(msg.sender, spender, value);
@@ -115,5 +86,22 @@ contract ERC223Token is IERC223 {
         _approve(msg.sender, spender, _allowances[msg.sender][spender].sub(subtractedValue));
         return true;
     }
+
+
+    function burn(uint256 _value) public {
+        _burn(msg.sender, _value);
+    }
+
+    function _burn(address _who, uint256 _value) internal {
+        require(_value <= balances[_who], "Insuficient funds");
+        bytes memory empty = hex"00000000";
+
+        balances[_who] = balances[_who].sub(_value);
+        _totalSupply = _totalSupply.sub(_value);
+
+        emit Burn(_who, _value);
+        emit Transfer(_who, address(0), _value, empty);
+    }
+
 
 }

@@ -5,17 +5,17 @@ import "./IERC223Recipient.sol";
 import "../math/SafeMath.sol";
 import "../utils/Address.sol";
 import "@openzeppelin/contracts/lifecycle/Pausable.sol";
-
+import "@openzeppelin/contracts/ownership/Ownable.sol";
 /**
  * @title Reference implementation of the ERC223 standard token.
  */
-contract ERC223Token is IERC223, Pausable {
+contract ERC223Token is IERC223, Pausable, Ownable {
 
     using SafeMath for uint;
 
-    event Burn(address indexed burner, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
-
+    event Burn(address indexed burner, uint256 value);
+    
     mapping(address => uint) balances; // List of user balances.
     mapping (address => mapping (address => uint256)) private _allowances;
 
@@ -90,11 +90,12 @@ contract ERC223Token is IERC223, Pausable {
     }
 
 
-    function burn(uint256 _value) public whenNotPaused {
+
+    function burn(uint256 _value) public onlyOwner whenNotPaused {
         _burn(msg.sender, _value);
     }
 
-    function _burn(address _who, uint256 _value) internal {
+    function _burn(address _who, uint256 _value) internal onlyOwner whenNotPaused  {
         require(_value <= balances[_who], "Insuficient funds");
         bytes memory empty = hex"00000000";
 
@@ -104,6 +105,4 @@ contract ERC223Token is IERC223, Pausable {
         emit Burn(_who, _value);
         emit Transfer(_who, address(0), _value, empty);
     }
-
-
 }

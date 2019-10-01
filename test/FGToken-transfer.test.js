@@ -27,6 +27,17 @@ contract('FGToken', accounts => {
             await truffleAssertions.passes(this.token.transfer(_to, _value));            
         });
 
+        it("should return fail for method transfer when token is paused", async () => {
+            await this.token.pause();
+            await truffleAssertions.fails(this.token.transfer(accounts[1], 500), 'Pausable: paused');            
+        });
+
+
+        it("should return fail for method transfer with param _data when token is paused", async () => {
+            await this.token.pause();
+            await truffleAssertions.fails(this.token.transfer(accounts[1], 500, new Uint8Array([83,97,109,112,108,101,32,68,97,116,97])), 'Pausable: paused');            
+        });
+
         it('should make transfer between accounts[1] and accounts[2], with success', async () => {
             await this.token.transfer(accounts[1], 500);
             await this.token.transfer(accounts[2], 200, { from: accounts[1] });
@@ -108,7 +119,6 @@ contract('FGToken', accounts => {
             await truffleAssertions.reverts(this.token.transfer(_to, _value, _data), 'Insuficient funds');         
             expect(balance.toNumber()).to.equal(_initialSupply);
         });
-      
     });
 
 });

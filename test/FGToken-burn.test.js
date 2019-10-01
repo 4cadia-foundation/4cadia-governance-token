@@ -24,6 +24,10 @@ contract('FGToken', accounts => {
         await truffleAssertions.fails(this.token.burn(10), 'Pausable: paused');
     });
 
+    it('should fails for account of not is an owner', async () => {
+        await truffleAssertions.fails(this.token.burn(100, {from: accounts[3]}), 'Ownable: caller is not the owner');
+    });
+
     it('should return insuficient funds', async () => {
         await truffleAssertions.reverts(this.token.burn(9000), 'Insuficient funds');
     });

@@ -108,7 +108,6 @@ contract('FGToken', accounts => {
             await truffleAssertions.reverts(this.token.transfer(_to, _value, _data), 'Insuficient funds');         
             expect(balance.toNumber()).to.equal(_initialSupply);
         });
-      
     });
 
 });

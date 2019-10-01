@@ -10,23 +10,78 @@ contract('FGToken', accounts => {
     const _initialSupply = 1000;
 
     beforeEach(async () => {
-        this.token = await FGToken.new(_name, _symbol, _decimals, _initialSupply);
+        token = await FGToken.new(_name, _symbol, _decimals, _initialSupply);
     });
 
-    describe ('Mintable', () => {
+    describe('Mintable - Create', function () {
 
+        it("creator address is Minter at create", async () => {
+            const owner = accounts[0];
+            const isMinter = await token.isMinter(owner);
+            assert.equal(isMinter, true, 'owner has not Minter role');
+        });
         
-        it("mint transaction exists", async () => {
-            const account = accounts[1];
-            const amount = 500;
-            await truffleAssertions.passes(this.token.mint(account, amount));
+        it('other address cannot be Minter at create', async() => {
+            const nonowner = accounts[1];
+            const isMinter = await token.isMinter(nonowner)
+            assert.equal(isMinter, false, 'nonowner has Minter role')
+        })
+    });
+        
+    describe('Mintable - Mint', function () {
+        
+        it("Owner can mint", async () => {
+            const owner = accounts[0];
+            const nonowner = accounts[1];
+            const amount = 10;
+            await truffleAssertions.passes(token.mint(nonowner, amount, { from: owner }));
         });
 
-        it("should be return true if account is Minter", async () => {
-            const account = accounts[1];
-            let isMinter = await this.token.isMinter(account)
-            console.log ('      address: ' + account)
-            assert.equal(isMinter, true, 'this address is not Minter')
+        it("nonowner cannot mint", async () => {
+            const nonowner1 = accounts[1];
+            const nonowner2 = accounts[2];
+            const amount = 10;
+            await truffleAssertions.reverts(token.mint(nonowner1, amount, { from: nonowner2 }));
+        });
+    });
+
+    describe('Mintable - Minter Role', function () {
+
+        it("Minter can addMinter", async () => {
+            const owner = accounts[0];
+            const nonowner = accounts[1];
+            await truffleAssertions.passes(token.addMinter(nonowner, { from: owner }));
+        });
+
+        it("nonMinter cannot addMinter", async () => {
+            const nonowner1 = accounts[1];
+            const nonowner2 = accounts[2];
+            await truffleAssertions.reverts(token.addMinter(nonowner1, { from: nonowner2 }));
+        });
+
+        it("Minter can removeMinter", async () => {
+            const owner = accounts[0];
+            const nonowner = accounts[1];
+            token.addMinter(nonowner, { from: owner })
+            await truffleAssertions.passes(token.removeMinter(nonowner, { from: owner }));
+        });
+
+        it("nonMinter cannot removeMinter", async () => {
+            const owner = accounts[0];
+            const nonowner1 = accounts[1];
+            const nonowner2 = accounts[2];
+            token.addMinter(nonowner1, { from: owner })
+            await truffleAssertions.reverts(token.removeMinter(nonowner1, { from: nonowner2 }));
+        });
+
+        it("Minter can renounceMinter", async () => {
+            const owner = accounts[0];
+            await truffleAssertions.passes(token.renounceMinter({ from: owner }));
+        });
+
+        it("nonMinter cannot renounceMinter", async () => {
+            const nonowner1 = accounts[1];
+            await truffleAssertions.reverts(token.renounceMinter({ from: nonowner1 }));
         });
     });
 });

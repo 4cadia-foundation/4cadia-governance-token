@@ -42,6 +42,18 @@ contract('FGToken', accounts => {
             assert.equal(afterIncreaseAllowance.toNumber(), (beforeIncreaseAllowance.toNumber() + value));
         });
 
+        it('should fails for method increaseAllowance when token is paused', async () => {
+            const value = 100;
+            await this.token.pause();
+            await truffleAssertions.fails(this.token.increaseAllowance(accountSub, value, { from: accountOwner }), 'Pausable: paused');
+        });
+
+        it('should fails for method decreaseAllowance when token is paused', async () => {
+            const value = 100;
+            await this.token.pause();
+            await truffleAssertions.fails(this.token.decreaseAllowance(accountSub, value, { from: accountOwner }), 'Pausable: paused');
+        });
+
         it('should decrease allowance', async () => {
             const value = 100;
     
@@ -60,9 +72,15 @@ contract('FGToken', accounts => {
     
     describe('approve', () => {
  
-        it ('should execite a function approve', async () => {
+        it ('should execute a function approve', async () => {
             await truffleAssertions.passes(this.token.approve(accounts[1], 200, {from: accounts[0]}))
         });
+
+        it ('should fail when token is paused', async () => {
+            await this.token.pause();
+            await truffleAssertions.fails(this.token.approve(accounts[1], 200, {from: accounts[0]}), 'Pausable: paused');
+        });
+        
 
         it('should approve balance of account owner for accountSub', async () => {
             await this.token.approve(accountSub, 200, {from: accountOwner});

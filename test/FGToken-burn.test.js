@@ -19,6 +19,11 @@ contract('FGToken', accounts => {
         await truffleAssertions.passes(this.token.burn(10));
     });
 
+    it('should fails for method burn when token is paused', async () => {
+        await this.token.pause();
+        await truffleAssertions.fails(this.token.burn(10), 'Pausable: paused');
+    });
+
     it('should return insuficient funds', async () => {
         await truffleAssertions.reverts(this.token.burn(9000), 'Insuficient funds');
     });

@@ -9,7 +9,6 @@ import "./ERC223.sol";
  * At construction, the deployer of the contract is the only minter.
  */
 contract ERC223Mintable is ERC223Token {
-    
     event MinterAdded(address indexed account);
     event MinterRemoved(address indexed account);
 
@@ -32,8 +31,12 @@ contract ERC223Mintable is ERC223Token {
         _addMinter(account);
     }
 
-    function renounceMinter() public {
+    function renounceMinter() public onlyMinter {
         _removeMinter(msg.sender);
+    }
+
+    function removeMinter(address account) public onlyMinter {
+        _removeMinter(account);
     }
 
     function _addMinter(address account) internal {

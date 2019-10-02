@@ -1,5 +1,4 @@
 const FGToken = artifacts.require('FGToken');
-const { should } = require('./helpers');
 const truffleAssertions = require('truffle-assertions');
 
 contract('FGToken', accounts => {
@@ -39,6 +38,6 @@ contract('FGToken', accounts => {
 
   it('should emit event for burn', async () => {
     const burnTransaction = await this.token.burn(100);
-    truffleAssertions.eventEmitted(burnTransaction, 'Burn', ev => ev.burner == accounts[0] && Number(ev.value) == 100);
+    truffleAssertions.eventEmitted(burnTransaction, 'Burn', ev => ev.burner === accounts[0] && Number(ev.value) === 100);
   });
 });

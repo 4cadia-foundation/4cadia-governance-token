@@ -1,6 +1,5 @@
 const FGToken = artifacts.require('FGToken');
 const truffleAssertions = require('truffle-assertions');
-const { should } = require('./helpers');
 
 contract('FGToken', accounts => {
   let accountOwner;
@@ -31,12 +30,9 @@ contract('FGToken', accounts => {
 
     it('should add new balance', async () => {
       const value = 100;
-      let beforeIncreaseAllowance;
-      let afterIncreaseAllowance;
-
-      beforeIncreaseAllowance = await this.token.allowance(accountOwner, accountSub);
+      const beforeIncreaseAllowance = await this.token.allowance(accountOwner, accountSub);
       await this.token.increaseAllowance(accountSub, value, { from: accountOwner });
-      afterIncreaseAllowance = await this.token.allowance(accountOwner, accountSub);
+      const afterIncreaseAllowance = await this.token.allowance(accountOwner, accountSub);
       assert.equal(afterIncreaseAllowance.toNumber(), (beforeIncreaseAllowance.toNumber() + value));
     });
 
@@ -54,15 +50,10 @@ contract('FGToken', accounts => {
 
     it('should decrease allowance', async () => {
       const value = 100;
-
-      let beforeDecreaseAllowance;
-      let afterDecreaseAllowance;
-
-      beforeDecreaseAllowance = await this.token.allowance(accountOwner, accountSub);
+      const beforeDecreaseAllowance = await this.token.allowance(accountOwner, accountSub);
 
       await this.token.decreaseAllowance(accountSub, value, { from: accountOwner });
-
-      afterDecreaseAllowance = await this.token.allowance(accountOwner, accountSub);
+      const afterDecreaseAllowance = await this.token.allowance(accountOwner, accountSub);
       assert.equal(afterDecreaseAllowance.toNumber(), (beforeDecreaseAllowance.toNumber() - value));
     });
   });
@@ -84,7 +75,7 @@ contract('FGToken', accounts => {
 
     it('should emit Approval event after approve', async () => {
       const approval = await this.token.approve(accountSub, 200, { from: accountOwner });
-      truffleAssertions.eventEmitted(approval, 'Approval', ev => ev.owner == accountOwner && ev.spender == accountSub && Number(ev.value) == 200);
+      truffleAssertions.eventEmitted(approval, 'Approval', ev => ev.owner === accountOwner && ev.spender === accountSub && Number(ev.value) === 200);
     });
   });
 

@@ -1,5 +1,4 @@
 const FGToken = artifacts.require('FGToken');
-const { should } = require('./helpers');
 const truffleAssertions = require('truffle-assertions');
 
 contract('FGToken', accounts => {
@@ -32,6 +31,5 @@ contract('FGToken', accounts => {
       await this.token.transfer(accounts[1], 500);
       assert.equal(Number(await this.token.balanceOf(accounts[1])), 500);
     });
-
   });
 });

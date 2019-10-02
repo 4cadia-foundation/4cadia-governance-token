@@ -1,7 +1,6 @@
 const FGToken = artifacts.require('FGToken');
-const { should } = require('./helpers');
 
-contract('FGToken', acounts => {
+contract('FGToken', () => {
   const _name = 'FGToken';
   const _symbol = 'FGT';
   const _decimals = 8;

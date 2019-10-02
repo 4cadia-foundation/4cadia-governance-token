@@ -1,6 +1,5 @@
 const FGToken = artifacts.require('FGToken');
 const BalanceContract = artifacts.require('BalanceContract');
-const { should } = require('./helpers');
 const truffleAssertions = require('truffle-assertions');
 
 contract('FGToken', accounts => {

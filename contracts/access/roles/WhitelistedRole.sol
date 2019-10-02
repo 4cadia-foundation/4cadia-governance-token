@@ -1,6 +1,6 @@
 pragma solidity ^0.5.0;
 
-import "@openzeppelin/contracts/GSN/Context.sol";
+import "../../utils/Context.sol";
 import "../Roles.sol";
 import "./WhitelistAdminRole.sol";
 

@@ -6,14 +6,15 @@ import "./IERC223Recipient.sol";
 import "./FGTokenDetailed.sol";
 import "../math/SafeMath.sol";
 import "../utils/Address.sol";
+import "../utils/Context.sol";
 import "../access/roles/CFORole.sol";
 import "../access/roles/CEORole.sol";
-import "@openzeppelin/contracts/lifecycle/Pausable.sol";
+import "./Pausable.sol";
 
 /**
  * @title Reference implementation of the ERC223 standard token.
  */
-contract FGToken is IERC223, IERC20, FGTokenDetailed, Pausable, CFORole, CEORole {
+contract FGToken is FGTokenDetailed, IERC223, IERC20, Pausable, Context, CFORole, CEORole {
 
     using SafeMath for uint;
 
@@ -23,8 +24,8 @@ contract FGToken is IERC223, IERC20, FGTokenDetailed, Pausable, CFORole, CEORole
     mapping(address => uint) balances; // List of user balances.
     mapping (address => mapping (address => uint256)) private _allowances;
 
-    constructor (string memory _name, string memory _symbol, uint8 _decimals, uint256 initialSupply) FGTokenDetailed(_name,_symbol,_decimals) public {
-        mint(msg.sender, initialSupply);
+    constructor (string memory _name, string memory _symbol, uint8 _decimals, uint256 initialSupply) FGTokenDetailed(_name,_symbol,_decimals ) public {
+        mint(_msgSender(), initialSupply);
     }
 
     /**
@@ -42,13 +43,13 @@ contract FGToken is IERC223, IERC20, FGTokenDetailed, Pausable, CFORole, CEORole
     }
 
     function transfer(address _to, uint _value, bytes memory _data) public whenNotPaused returns (bool success){
-        _transfer(msg.sender, _to, _value, _data);
+        _transfer(_msgSender(), _to, _value, _data);
         return true;
     }
 
     function transfer(address _to, uint _value) public whenNotPaused returns (bool success){
         bytes memory empty = hex"00000000";
-        _transfer(msg.sender, _to, _value, empty);
+        _transfer(_msgSender(), _to, _value, empty);
         return true;
     }
 
@@ -67,7 +68,7 @@ contract FGToken is IERC223, IERC20, FGTokenDetailed, Pausable, CFORole, CEORole
     }
 
     function approve(address spender, uint256 value) public whenNotPaused returns (bool) {
-        _approve(msg.sender, spender, value);
+        _approve(_msgSender(), spender, value);
         return true;
     }
 
@@ -83,7 +84,7 @@ contract FGToken is IERC223, IERC20, FGTokenDetailed, Pausable, CFORole, CEORole
     function transferFrom(address _sender, address _to, uint256 _amount) public whenNotPaused returns (bool) {
         bytes memory empty = hex"00000000";
         _transfer(_sender, _to, _amount, empty);
-        _approve(_sender, msg.sender, _allowances[_sender][msg.sender].sub(_amount));
+        _approve(_sender, _msgSender(), _allowances[_sender][_msgSender()].sub(_amount));
         return true;
     }
 
@@ -92,12 +93,12 @@ contract FGToken is IERC223, IERC20, FGTokenDetailed, Pausable, CFORole, CEORole
     }
 
     function increaseAllowance(address spender, uint256 addedValue) public whenNotPaused returns (bool) {
-        _approve(msg.sender, spender, _allowances[msg.sender][spender].add(addedValue));
+        _approve(_msgSender(), spender, _allowances[_msgSender()][spender].add(addedValue));
         return true;
     }
 
     function decreaseAllowance(address spender, uint256 subtractedValue) public whenNotPaused returns (bool) {
-        _approve(msg.sender, spender, _allowances[msg.sender][spender].sub(subtractedValue));
+        _approve(_msgSender(), spender, _allowances[_msgSender()][spender].sub(subtractedValue));
         return true;
     }
 
@@ -120,7 +121,7 @@ contract FGToken is IERC223, IERC20, FGTokenDetailed, Pausable, CFORole, CEORole
     }
 
     function burn(uint256 _amount) public onlyCFO whenNotPaused {
-        _burn(msg.sender, _amount);
+        _burn(_msgSender(), _amount);
     }
 
     function _burn(address _who, uint256 _amount) internal  {

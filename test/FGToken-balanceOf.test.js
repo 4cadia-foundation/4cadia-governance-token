@@ -29,8 +29,9 @@ contract('FGToken', accounts => {
 
     it('should return balance of other account after execute transfer', async () => {
       assert.equal(Number(await this.token.balanceOf(accounts[1])), 0);
-      await this.token.transfer(accounts[1], 500, { from: this.accountOwner });
+      await this.token.transfer(accounts[1], 500);
       assert.equal(Number(await this.token.balanceOf(accounts[1])), 500);
     });
+
   });
 });

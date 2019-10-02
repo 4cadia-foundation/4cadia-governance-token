@@ -41,14 +41,14 @@ contract FGToken is IERC223, FGTokenDetailed, CFORole, CEORole, Pausable {
         return _totalSupply;
     }
 
-    function transfer(address _to, uint _value, bytes memory _data) public whenNotPaused returns (bool success){
-        _transfer(_msgSender(), _to, _value, _data);
+    function transfer(address _to, uint _value) public whenNotPaused returns (bool success){
+        bytes memory empty;
+        _transfer(_msgSender(), _to, _value, empty);
         return true;
     }
 
-    function transfer(address _to, uint _value) public whenNotPaused returns (bool success){
-        bytes memory empty = hex"00000000";
-        _transfer(_msgSender(), _to, _value, empty);
+     function transfer(address _to, uint _value, bytes memory _data) public whenNotPaused returns (bool success){
+        _transfer(_msgSender(), _to, _value, _data);
         return true;
     }
 
@@ -81,7 +81,7 @@ contract FGToken is IERC223, FGTokenDetailed, CFORole, CEORole, Pausable {
     }
 
     function transferFrom(address _sender, address _to, uint256 _amount) public whenNotPaused returns (bool) {
-        bytes memory empty = hex"00000000";
+        bytes memory empty = "";
         _transfer(_sender, _to, _amount, empty);
         _approve(_sender, _msgSender(), _allowances[_sender][_msgSender()].sub(_amount));
         return true;

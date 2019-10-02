@@ -95,10 +95,9 @@ contract('FGToken', accounts => {
     });
 
     it('should return insuficient funds', async () => {
-      await this.token.approve(accountSub, 200, { from: accountOwner });
-      await this.token.transfer(accounts[4], 1000, { from: accountOwner });
-
-      await truffleAssertions.fails(this.token.transferFrom(accountOwner, receiverAccount, 200, { from: accountSub }));
+      await this.token.approve(accountSub, 200);
+      await this.token.transfer(accounts[4], 1000);
+      await truffleAssertions.fails(this.token.transferFrom(accountOwner, receiverAccount, 200), 'Insuficient funds');
     });
   });
 });

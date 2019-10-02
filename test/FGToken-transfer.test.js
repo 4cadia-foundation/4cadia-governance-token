@@ -35,19 +35,6 @@ contract('FGToken', accounts => {
       await truffleAssertions.fails(this.token.transfer(accounts[1], 500, new Uint8Array([83, 97, 109, 112, 108, 101, 32, 68, 97, 116, 97])), 'Pausable: paused');
     });
 
-    it('should make transfer between accounts[1] and accounts[2], with success', async () => {
-      await this.token.transfer(accounts[1], 500);
-      await this.token.transfer(accounts[2], 200, { from: accounts[1] });
-
-      const balanceOwner = await this.token.balanceOf(accounts[0]);
-      const balanceA = await this.token.balanceOf(accounts[1]);
-      const balanceB = await this.token.balanceOf(accounts[2]);
-
-      assert.equal(balanceA.toNumber(), 300, 'accounts[1] balance is wrong');
-      assert.equal(balanceB.toNumber(), 200, 'accounts[2] balance is wrong');
-      assert.equal(balanceOwner.toNumber(), 500, 'accounts[0] balance is wrong');
-    });
-
     it('should transfer value of address owner for other account', async () => {
       const _to = accounts[1];
       const _value = 500;

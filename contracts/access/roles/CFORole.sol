@@ -16,7 +16,7 @@ contract CFORole is Context {
     Roles.Role private CFOs;
 
     constructor () internal {
-        // _addCFO(_msgSender());
+        _addCFO(_msgSender());
     }
 
     modifier onlyCFO() {

@@ -2,12 +2,13 @@ pragma solidity ^0.5.1;
 
 import "../../utils/Context.sol";
 import "../Roles.sol";
+import "./CEORole.sol";
 
 /**
  * @title Chief financial officer
  * @dev CFO are responsible for Mint and Burn Token.
  */
-contract CFORole is Context {
+contract CFORole is Context, CEORole {
     using Roles for Roles.Role;
 
     event CFOAdded(address indexed account);
@@ -28,7 +29,7 @@ contract CFORole is Context {
         return CFOs.has(account);
     }
 
-    function addCFO(address account) public onlyCFO {
+    function addCFO(address account) public onlyCEO {
         _addCFO(account);
     }
 

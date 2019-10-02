@@ -14,7 +14,7 @@ contract('CFORole', accounts => {
   });
 
   it('should return fail for add a new cfo, address not owner', async () => {
-    await truffleAssertions.fails(this.contract.addCFO(addressCfo, { from: accounts[3] }), 'CFORole: caller does not have the CFO role');
+    await truffleAssertions.fails(this.contract.addCFO(addressCfo, { from: accounts[3] }), 'CEORole: caller does not have the CEO role');
   });
 
   it('should renounce cfo', async () => {

@@ -1,12 +1,11 @@
 pragma solidity ^0.5.1;
 
 import "./IERC223.sol";
-import "./IERC20.sol";
+
 import "./IERC223Recipient.sol";
 import "./FGTokenDetailed.sol";
 import "../math/SafeMath.sol";
 import "../utils/Address.sol";
-import "../utils/Context.sol";
 import "../access/roles/CFORole.sol";
 import "../access/roles/CEORole.sol";
 import "./Pausable.sol";
@@ -14,7 +13,7 @@ import "./Pausable.sol";
 /**
  * @title Reference implementation of the ERC223 standard token.
  */
-contract FGToken is FGTokenDetailed, IERC223, IERC20, Pausable, Context, CFORole, CEORole {
+contract FGToken is IERC223, FGTokenDetailed, CFORole, CEORole, Pausable {
 
     using SafeMath for uint;
 
@@ -115,9 +114,10 @@ contract FGToken is FGTokenDetailed, IERC223, IERC20, Pausable, Context, CFORole
 
     function _mint(address account, uint256 amount) internal {
         require(account != address(0), "ERC20: mint to the zero address");
+        bytes memory empty = hex"00000000";
         _totalSupply = _totalSupply.add(amount);
         balances[account] = balances[account].add(amount);
-        emit Transfer(address(0), account, amount);
+        emit Transfer(address(0), account, amount, empty);
     }
 
     function burn(uint256 _amount) public onlyCFO whenNotPaused {

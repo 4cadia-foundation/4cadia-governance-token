@@ -9,32 +9,46 @@ contract('FGToken', accounts => {
 
   let accountOwner;
   let accountNoOwner;
-  let accountNoOwner2;
   let amount;
 
-  describe('Mintable Functions', () => {
-    beforeEach(async () => {
+  describe('at Mint', () => {
+    beforeEach('minting', async () => {
       accountOwner = accounts[0];
       accountNoOwner = accounts[1];
-      accountNoOwner2 = accounts[2];
-      amount = 10;
+      accountNoOwner = accounts[2];
+      amount = 100;
 
       this.token = await FGToken.new(_name, _symbol, _decimals, _initialSupply, { from: accountOwner });
     });
 
-    describe('when create', () => {
-      it('should have the contract owner with properly role', async () => {
-        const isCFO = await this.token.isCFO(accountOwner);
-        assert.equal(isCFO, true, 'this address has not permission to mint');
-      });
+    it('should fail if account has not properly role', async () => {
+      await truffleAssertions.fails(this.token.mint(amount, { from: accountNoOwner }), 'CFORole: caller does not have the CFO role');
     });
 
-    describe('when mint', () => {
-      it('should pass if account has properly role', async () => {
-        await truffleAssertions.passes(this.token.mint(accountNoOwner, amount, { from: accountOwner }));
+    it('should get the totalsupply', async () => {
+      const totalSupply = await this.token.totalSupply();
+      assert.equal(totalSupply, _initialSupply);
+    });
+
+    describe('when address has properly role', () => {
+      it('should execute method mint with success', async () => {
+        await truffleAssertions.passes(this.token.mint(amount));
       });
-      it('should fail if account has not properly role', async () => {
-        await truffleAssertions.reverts(this.token.mint(accountNoOwner, amount, { from: accountNoOwner2 }));
+
+      it('should fails for method mint when token is paused', async () => {
+        await this.token.pause();
+        await truffleAssertions.reverts(this.token.mint(amount), 'Pausable: paused');
+      });
+
+      it('should add the balance of totalsupply', async () => {
+        await this.token.mint(amount);
+        const totalSupply = await this.token.totalSupply();
+        assert.equal(totalSupply, _initialSupply + amount);
+      });
+
+      it('should emit event for mint', async () => {
+        const mintTransaction = await this.token.mint(amount);
+        truffleAssertions.eventEmitted(mintTransaction, 'Mint', ev => ev.minter === accountOwner && Number(ev.value) === amount);
       });
     });
   });

@@ -19,12 +19,13 @@ contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, Pausable {
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Burn(address indexed burner, uint256 value);
+    event Mint(address indexed minter, uint256 value);
 
     mapping(address => uint) balances; // List of user balances.
     mapping (address => mapping (address => uint256)) private _allowances;
 
     constructor (string memory _name, string memory _symbol, uint8 _decimals, uint256 initialSupply) FGTokenDetailed(_name,_symbol,_decimals ) public {
-        mint(_msgSender(), initialSupply);
+        mint(initialSupply);
     }
 
     /**
@@ -108,16 +109,19 @@ contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, Pausable {
      *
      * - the caller must have the {MinterRole}.
      */
-    function mint(address account, uint256 amount) public onlyCFO returns (bool) {
-        _mint(account, amount);
+    function mint(uint256 amount) public onlyCFO whenNotPaused {
+        _mint(_msgSender(), amount);
     }
 
-    function _mint(address account, uint256 amount) internal {
-        require(account != address(0), "ERC20: mint to the zero address");
+    function _mint(address _account, uint256 _amount) internal {
+        require(_account != address(0), "ERC20: mint to the zero address");
         bytes memory empty = hex"00000000";
-        _totalSupply = _totalSupply.add(amount);
-        balances[account] = balances[account].add(amount);
-        emit Transfer(address(0), account, amount, empty);
+
+        balances[_account] = balances[_account].add(_amount);
+        _totalSupply = _totalSupply.add(_amount);
+
+        emit Mint(_account, _amount);
+        emit Transfer(address(0), _account, _amount, empty);
     }
 
     function burn(uint256 _amount) public onlyCFO whenNotPaused {

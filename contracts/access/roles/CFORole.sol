@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.1;
 
 import "../../utils/Context.sol";
 import "../Roles.sol";
@@ -16,7 +16,7 @@ contract CFORole is Context {
     Roles.Role private CFOs;
 
     constructor () internal {
-        // _addCFO(_msgSender());
+        _addCFO(_msgSender());
     }
 
     modifier onlyCFO() {

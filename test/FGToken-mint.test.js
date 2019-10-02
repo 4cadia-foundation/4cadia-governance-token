@@ -25,14 +25,19 @@ contract('FGToken', accounts => {
       await truffleAssertions.fails(this.token.mint(amount, { from: accountNoOwner }), 'CFORole: caller does not have the CFO role');
     });
 
+    it('should get the totalsupply', async () => {
+      const totalSupply = await this.token.totalSupply();
+      assert.equal(totalSupply, _initialSupply);
+    });
+
     describe('when address has properly role', () => {
       it('should execute method mint with success', async () => {
-        await truffleAssertions.passes(await this.token.mint(amount));
+        await truffleAssertions.passes(this.token.mint(amount));
       });
 
       it('should fails for method mint when token is paused', async () => {
         await this.token.pause();
-        await truffleAssertions.reverts(await this.token.mint(amount), 'Pausable: paused');
+        await truffleAssertions.reverts(this.token.mint(amount), 'Pausable: paused');
       });
 
       it('should add the balance of totalsupply', async () => {
@@ -42,7 +47,8 @@ contract('FGToken', accounts => {
       });
 
       it('should emit event for mint', async () => {
-        truffleAssertions.eventEmitted(await this.token.mint(amount), 'Mint', ev => ev.minter === accountOwner && Number(ev.value) === amount);
+        const mintTransaction = await this.token.mint(amount);
+        truffleAssertions.eventEmitted(mintTransaction, 'Mint', ev => ev.minter === accountOwner && Number(ev.value) === amount);
       });
     });
   });

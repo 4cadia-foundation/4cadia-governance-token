@@ -13,7 +13,7 @@ import "./Pausable.sol";
 /**
  * @title Reference implementation of the ERC223 standard token.
  */
-contract FGToken is IERC223, FGTokenDetailed, CFORole, CEORole, Pausable {
+contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, Pausable {
 
     using SafeMath for uint;
 

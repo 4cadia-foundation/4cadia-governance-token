@@ -24,7 +24,7 @@ contract('FGToken', accounts => {
   });
 
   it('should fails for account of not is an owner', async () => {
-    await truffleAssertions.fails(this.token.burn(100, { from: accounts[3] }), 'Ownable: caller is not the owner');
+    await truffleAssertions.fails(this.token.burn(100, { from: accounts[3] }), 'CFORole: caller does not have the CFO role');
   });
 
   it('should return insuficient funds', async () => {

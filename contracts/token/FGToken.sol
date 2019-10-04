@@ -9,23 +9,33 @@ import "../utils/Address.sol";
 import "../access/roles/CFORole.sol";
 import "../access/roles/CEORole.sol";
 import "./Pausable.sol";
+import "./Announcement.sol";
+import "./MaxCap.sol";
 
 /**
  * @title Reference implementation of the ERC223 standard token.
  */
-contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, Pausable {
+contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, Pausable, MaxCap, Announcement{
 
     using SafeMath for uint;
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Burn(address indexed burner, uint256 value);
     event Mint(address indexed minter, uint256 value);
-
-    mapping(address => uint) balances; // List of user balances.
+ 
+    
+    mapping(address => uint) balances;
     mapping (address => mapping (address => uint256)) private _allowances;
 
-    constructor (string memory _name, string memory _symbol, uint8 _decimals, uint256 initialSupply) FGTokenDetailed(_name,_symbol,_decimals ) public {
-        mint(initialSupply);
+   
+
+    constructor (
+        string memory _name, string memory _symbol, 
+        uint8 _decimals, uint256 _initialSupply, uint256 _maxCap) 
+        FGTokenDetailed(_name,_symbol,_decimals ) public {
+        require(_initialSupply <= _maxCap, 'initial supply must be less than maxcap');
+        mint(_initialSupply);
+        increaseMaxCap(_maxCap);
     }
 
     /**
@@ -115,6 +125,8 @@ contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, Pausable {
 
     function _mint(address _account, uint256 _amount) internal {
         require(_account != address(0), "ERC20: mint to the zero address");
+        require(_amount <= forecast_, "amount must be less than forecast value");
+
         bytes memory empty = hex"00000000";
 
         balances[_account] = balances[_account].add(_amount);
@@ -138,4 +150,14 @@ contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, Pausable {
         emit Burn(_who, _amount);
         emit Transfer(_who, address(0), _amount, empty);
     }
+
+    /**
+    * Forecast
+     */
+    function increaseForecast(uint256 _value) public whenNotPaused onlyCFO returns ( bool success ){
+        require((forecast() + _value + _totalSupply) <= maxCap_, 'errro');
+        super.increaseForecast(_value);
+        return true;
+    }
+
 }

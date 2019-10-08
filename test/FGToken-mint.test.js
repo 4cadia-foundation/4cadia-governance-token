@@ -5,7 +5,7 @@ contract('FGToken', accounts => {
   const _name = 'FGToken';
   const _symbol = 'FGT';
   const _decimals = 8;
-  const _initialSupply = 0;
+  const _maxCap = 0;
 
   let accountOwner;
   let accountNoOwner;
@@ -18,7 +18,8 @@ contract('FGToken', accounts => {
       accountNoOwner = accounts[2];
       amount = 100;
 
-      this.token = await FGToken.new(_name, _symbol, _decimals, _initialSupply, { from: accountOwner });
+      this.token = await FGToken.new(_name, _symbol, _decimals, 1000, { from: accountOwner });
+      await this.token.increaseForecast(amount);
     });
 
     it('should fail if account has not properly role', async () => {
@@ -27,7 +28,7 @@ contract('FGToken', accounts => {
 
     it('should get the totalsupply', async () => {
       const totalSupply = await this.token.totalSupply();
-      assert.equal(totalSupply, _initialSupply);
+      assert.equal(totalSupply, _maxCap);
     });
 
     describe('when address has properly role', () => {
@@ -43,7 +44,7 @@ contract('FGToken', accounts => {
       it('should add the balance of totalsupply', async () => {
         await this.token.mint(amount);
         const totalSupply = await this.token.totalSupply();
-        assert.equal(totalSupply, _initialSupply + amount);
+        assert.equal(totalSupply, _maxCap + amount);
       });
 
       it('should emit event for mint', async () => {

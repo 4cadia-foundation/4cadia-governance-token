@@ -2,15 +2,17 @@ const FGToken = artifacts.require('FGToken');
 const truffleAssertions = require('truffle-assertions');
 
 contract('FGToken', accounts => {
-  const _initialSupply = 1000;
+  const maxCap = 1000;
 
   beforeEach(async () => {
-    this.token = await FGToken.new('FGToken', 'FGT', 8, _initialSupply);
+    this.token = await FGToken.new('FGToken', 'FGT', 8, 1000);
+    await this.token.increaseForecast(1000);
+    await this.token.mint(1000);
   });
 
   it('should get the totalsupply', async () => {
     const totalSupply = await this.token.totalSupply();
-    assert.equal(totalSupply, _initialSupply);
+    assert.equal(totalSupply, maxCap);
   });
 
   it('should execute method burn with success', async () => {
@@ -33,7 +35,7 @@ contract('FGToken', accounts => {
   it('should substract the balance of totalsupply', async () => {
     await this.token.burn(100);
     const totalSupply = await this.token.totalSupply();
-    assert.equal(totalSupply, _initialSupply - 100);
+    assert.equal(totalSupply, maxCap - 100);
   });
 
   it('should emit event for burn', async () => {

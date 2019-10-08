@@ -22,19 +22,14 @@ contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, Pausable, MaxCap
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Burn(address indexed burner, uint256 value);
     event Mint(address indexed minter, uint256 value);
- 
-    
+
     mapping(address => uint) balances;
     mapping (address => mapping (address => uint256)) private _allowances;
 
-   
-
     constructor (
         string memory _name, string memory _symbol, 
-        uint8 _decimals, uint256 _initialSupply, uint256 _maxCap) 
+        uint8 _decimals, uint256 _maxCap) 
         FGTokenDetailed(_name,_symbol,_decimals ) public {
-        require(_initialSupply <= _maxCap, 'initial supply must be less than maxcap');
-        mint(_initialSupply);
         increaseMaxCap(_maxCap);
     }
 
@@ -155,7 +150,8 @@ contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, Pausable, MaxCap
     * Forecast
      */
     function increaseForecast(uint256 _value) public whenNotPaused onlyCFO returns ( bool success ){
-        require((forecast() + _value + _totalSupply) <= maxCap_, 'errro');
+        uint256 total = forecast() + _value + _totalSupply;
+        require(total <= maxCap_, 'the value announcement not be greater than the maxcap');
         super.increaseForecast(_value);
         return true;
     }

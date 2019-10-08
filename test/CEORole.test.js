@@ -6,7 +6,9 @@ contract('CEORole', accounts => {
   const addressCeo = accounts[2];
 
   beforeEach(async () => {
-    this.contract = await FGToken.new('FGToken', 'FGT', 8, 1000);
+    this.contract = await FGToken.new('FGToken', 'FGT', 8, 5000);
+    await this.contract.increaseForecast(1000);
+    await this.contract.mint(1000);
   });
 
   it('should add a new ceo', async () => {

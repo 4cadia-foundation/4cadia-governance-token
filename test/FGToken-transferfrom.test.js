@@ -12,6 +12,8 @@ contract('FGToken', accounts => {
     receiverAccount = accounts[3];
 
     this.token = await FGToken.new('FGToken', 'FGT', 8, 1000);
+    await this.token.increaseForecast(1000);
+    await this.token.mint(1000);
   });
 
   describe('allowance', () => {

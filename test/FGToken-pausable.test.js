@@ -4,6 +4,8 @@ const truffleAssertions = require('truffle-assertions');
 contract('FGToken', accounts => {
   beforeEach(async () => {
     this.token = await FGToken.new('FGToken', 'FGT', 8, 1000);
+    await this.token.increaseForecast(1000);
+    await this.token.mint(1000);
   });
 
   it('should initialize token with not pausable', async () => {

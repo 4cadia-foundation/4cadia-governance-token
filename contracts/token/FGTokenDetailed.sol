@@ -1,11 +1,11 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.1;
 
 import "./IERC223.sol";
 
 /**
  * @dev Optional functions from the ERC223 standard.
  */
-contract ERC223Detailed is IERC223 {
+contract FGTokenDetailed is IERC223 {
     string private _name;
     string private _symbol;
     uint8 private _decimals;

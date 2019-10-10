@@ -1,7 +1,7 @@
-### Qualidade de Código
+### Code Quality 
 
-O código fonte e os artefatos relacionados a este projeto, devem seguir as boas práticas [SOLID](https://pt.wikipedia.org/wiki/SOLID), e apresentar alta qualidade de acordo com os requisitos estabelecidos pela arquitetura.
+This code project must be follow [SOLID](https://pt.wikipedia.org/wiki/SOLID) principles and keep high quality according prerequisites defined by architecture.
 
-Foi adotado como qualidade de código fonte o teste unitário para garantir o funcionamento isolado de cada funcionalidade. As funcionalidades implementadas no smartcontract possuem seus respectivos testes localizado no diretório tests.
+To ensure the code quality we use unit tests. Each implemented funcionality on smartcontract has isolated test in tests directory.
 
-Style Guide adotado para a boa escrita de testes esta no [link](https://github.com/mawrkus/js-unit-testing-guide#structure-your-tests-properly)
+Style Guide for write the tests [link](https://github.com/mawrkus/js-unit-testing-guide#structure-your-tests-properly)

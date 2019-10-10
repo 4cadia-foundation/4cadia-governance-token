@@ -1,4 +1,4 @@
-# Versionamento Semantico
+### Versionamento Semantico
 
 O sistema de versionamento semântico segue algumas regras básicas que ditam como os números das versões são atribuídas e incrementadas.
 Os números para as versões devem seguir o padrão x.y.z (Major.Minor.Patch).

@@ -2,9 +2,9 @@ pragma solidity ^0.5.1;
 
 import '../math/SafeMath.sol';
 import "./Pausable.sol";
-import "../access/roles/CEORole.sol";
+import "../access/roles/MaxCapRole.sol";
 
-contract MaxCap is CEORole, Pausable {
+contract MaxCap is MaxCapRole, Pausable {
 
     using SafeMath for uint;
 
@@ -16,7 +16,7 @@ contract MaxCap is CEORole, Pausable {
         return maxCap_;
     }
 
-    function increaseMaxCap (uint256 _value) public whenNotPaused onlyCEO returns(bool success) {
+    function increaseMaxCap (uint256 _value) public whenNotPaused onlyMaxCapManager returns(bool success) {
        require(_value != 0, 'value not zero');
        uint256 oldValue = maxCap_;
        maxCap_ = maxCap_.add(_value);
@@ -24,7 +24,7 @@ contract MaxCap is CEORole, Pausable {
        return true;
     }
 
-    function decreaseMaxCap (uint256 _value) public whenNotPaused onlyCEO returns(bool success) {
+    function decreaseMaxCap (uint256 _value) public whenNotPaused onlyMaxCapManager returns(bool success) {
         require(_value != 0, 'value not zero');
         require(_value <= maxCap_, 'value cannot be greater than maxCap');
         uint256 oldValue = maxCap_;

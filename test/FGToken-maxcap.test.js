@@ -27,12 +27,12 @@ contract('FGToken', accounts => {
       await truffleAssertions.fails(this.token.decreaseMaxCap(2000), 'value cannot be greater than maxCap');
     });
 
-    it('increaseMaxCap should fail with caller does not have the CEO role', async () => {
-      await truffleAssertions.fails(this.token.increaseMaxCap(1000, { from: accounts[1] }), 'CEORole: caller does not have the CEO role');
+    it('increaseMaxCap should fail with caller does not have the MaxCap role', async () => {
+      await truffleAssertions.fails(this.token.increaseMaxCap(1000, { from: accounts[1] }), 'MaxCapManager: caller does not have the MaxCap role');
     });
 
-    it('decreaseMaxCap should fail with caller does not have the CEO role', async () => {
-      await truffleAssertions.fails(this.token.decreaseMaxCap(1000, { from: accounts[1] }), 'CEORole: caller does not have the CEO role');
+    it('decreaseMaxCap should fail with caller does not have the MaxCap role', async () => {
+      await truffleAssertions.fails(this.token.decreaseMaxCap(1000, { from: accounts[1] }), 'MaxCapManager: caller does not have the MaxCap role');
     });
 
     it('should emit event MaxCapChange when increment', async () => {

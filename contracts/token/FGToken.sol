@@ -54,7 +54,7 @@ contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, MaxCapRole, Paus
         return true;
     }
 
-     function transfer(address _to, uint _value, bytes memory _data) public whenNotPaused returns (bool success){
+    function transfer(address _to, uint _value, bytes memory _data) public whenNotPaused returns (bool success){
         _transfer(_msgSender(), _to, _value, _data);
         return true;
     }

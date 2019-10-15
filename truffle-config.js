@@ -13,6 +13,9 @@ module.exports = {
       network_id: '*',
     },
   },
+  mocha: {
+    reporter: 'eth-gas-reporter',
+  },
   compilers: {
     solc: {
       version: '0.5.1', // Fetch exact version from solc-bin (default: truffle's version)

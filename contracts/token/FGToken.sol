@@ -122,11 +122,12 @@ contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, MaxCapRole, Paus
     function _mint(address _account, uint256 _amount) internal {
         require(_account != address(0), "ERC20: mint to the zero address");
         require(_amount <= forecast_, "amount must be less than forecast value");
-
+  
         bytes memory empty = hex"00000000";
 
         balances[_account] = balances[_account].add(_amount);
         _totalSupply = _totalSupply.add(_amount);
+        forecast_ = forecast_.sub(_amount);
 
         emit Mint(_account, _amount);
         emit Transfer(address(0), _account, _amount, empty);

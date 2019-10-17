@@ -5,7 +5,6 @@ contract('FGToken', accounts => {
   beforeEach(async () => {
     this.token = await FGToken.new('FGToken', 'FGT', 8, 5000);
     await this.token.increaseForecast(1000);
-    await this.token.mint(1000);
   });
 
   describe('increaseForecast', () => {

@@ -44,7 +44,7 @@ contract Announcement is CFORole, Pausable {
   */
     function decreaseForecast(uint256 _value) public whenNotPaused onlyCFO returns ( bool success )  {
         require(_value != 0, 'value cannot be zero');
-        require(forecast_ >= _value, 'forecast has no balance to decrement');
+        require(forecast_ > _value, 'forecast has no balance to decrement');
         uint256 oldValue = forecast_;
         forecast_ = forecast_.sub(_value);
         emit ForecastChange(oldValue, forecast_);

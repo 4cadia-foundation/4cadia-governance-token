@@ -8,7 +8,7 @@ contract('CFORole', accounts => {
   beforeEach(async () => {
     this.contract = await FGToken.new('FGToken', 'FGT', 8, 1000);
     await this.contract.increaseForecast(1000);
-    await this.contract.mint(1000);
+    await this.contract.mint(accounts[0], 1000);
   });
 
   it('should add a new cfo', async () => {

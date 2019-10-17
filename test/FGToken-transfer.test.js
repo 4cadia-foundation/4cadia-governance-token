@@ -11,7 +11,7 @@ contract('FGToken', accounts => {
   beforeEach(async () => {
     this.token = await FGToken.new(_name, _symbol, _decimals, 1000);
     await this.token.increaseForecast(1000);
-    await this.token.mint(1000);
+    await this.token.mint(accounts[0], 1000);
   });
 
   it('should validate balance initial supply', async () => {

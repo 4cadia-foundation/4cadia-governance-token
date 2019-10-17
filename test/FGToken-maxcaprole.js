@@ -9,13 +9,12 @@ contract('FGToken', accounts => {
   });
 
   describe('MaxCapRole', () => {
-
     it('should return maxcap manager', async () => {
       await truffleAssertions.passes(this.token.isMaxCapManager(accounts[0]));
     });
 
     it('should fails account not CEO role', async () => {
-      await truffleAssertions.fails(this.token.addMaxCapManager(accounts[2], { from: accounts[1] } ),'CEORole: caller does not have the CEO role');
+      await truffleAssertions.fails(this.token.addMaxCapManager(accounts[2], { from: accounts[1] }), 'CEORole: caller does not have the CEO role');
     });
 
     it('should add new maxcap manager', async () => {
@@ -34,9 +33,8 @@ contract('FGToken', accounts => {
 
     it('should emit event MaxCapManagerRemoved', async () => {
       await this.token.addMaxCapManager(accounts[1], { from: accounts[0] });
-      const transaction = await this.token.renounceMaxCapManager({from: accounts[1]});
+      const transaction = await this.token.renounceMaxCapManager({ from: accounts[1] });
       await truffleAssertions.eventEmitted(transaction, 'MaxCapManagerRemoved', ev => ev.account === accounts[1]);
     });
-
   });
 });

@@ -9,6 +9,7 @@ import "../utils/Address.sol";
 import "../access/roles/CFORole.sol";
 import "../access/roles/CEORole.sol";
 import "../access/roles/MaxCapRole.sol";
+import "../access/roles/WhitelistedRole.sol";
 import "./Pausable.sol";
 import "./Announcement.sol";
 import "./MaxCap.sol";
@@ -16,7 +17,7 @@ import "./MaxCap.sol";
 /**
  * @title Reference implementation of the ERC223 standard token.
  */
-contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, MaxCapRole, Pausable, MaxCap, Announcement{
+contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, MaxCapRole, Pausable, MaxCap, Announcement, WhitelistedRole {
 
     using SafeMath for uint;
 

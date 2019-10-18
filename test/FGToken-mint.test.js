@@ -55,6 +55,7 @@ contract('FGToken', accounts => {
         const mintTransaction = await this.token.mint(accountOwner, amount);
         truffleAssertions.eventEmitted(mintTransaction, 'Mint', ev => ev.minter === accountOwner && Number(ev.value) === amount);
       });
+
     });
   });
 });

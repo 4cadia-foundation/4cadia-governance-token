@@ -115,8 +115,8 @@ contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, MaxCapRole, Paus
      *
      * - the caller must have the {MinterRole}.
      */
-    function mint(uint256 amount) public onlyCFO whenNotPaused {
-        _mint(_msgSender(), amount);
+    function mint(address _account, uint256 amount) public onlyCFO whenNotPaused {
+        _mint(_account, amount);
     }
 
     function _mint(address _account, uint256 _amount) internal {

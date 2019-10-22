@@ -2,10 +2,15 @@ const FGToken = artifacts.require('FGToken');
 const truffleAssertions = require('truffle-assertions');
 
 contract('FGToken', accounts => {
+
+  const accountCFO = accounts[1];
+
   beforeEach(async () => {
     this.token = await FGToken.new('FGToken', 'FGT', 8, 1000);
-    await this.token.increaseForecast(1000);
-    await this.token.mint(accounts[0], 1000);
+
+    await this.token.addCFO(accountCFO, { from: accounts[0] });
+    await this.token.increaseForecast(1000, { from: accountCFO });
+    await this.token.mint(accountCFO, 1000, { from: accountCFO });
   });
 
   describe('maxCap', () => {

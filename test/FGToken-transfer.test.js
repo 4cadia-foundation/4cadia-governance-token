@@ -3,105 +3,66 @@ const BalanceContract = artifacts.require('BalanceContract');
 const truffleAssertions = require('truffle-assertions');
 
 contract('FGToken', accounts => {
-  const _name = 'FGToken';
-  const _symbol = 'FGT';
-  const _decimals = 8;
+
   const _initialSupply = 1000;
-
-  beforeEach(async () => {
-    this.token = await FGToken.new(_name, _symbol, _decimals, 1000);
-    await this.token.increaseForecast(1000);
-    await this.token.mint(accounts[0], 1000);
-  });
-
-  it('should validate balance initial supply', async () => {
-    const balanceOwner = await this.token.balanceOf(accounts[0]);
-    assert.equal(balanceOwner.toNumber(), _initialSupply, 'accounts[0] balance is wrong');
-  });
+  const accountOwner = accounts[0];
+  const accountCEO = accounts[1];
+  const accountCFO = accounts[2];
+  const accountAlpha = accounts[3];
+  const accountBetha = accounts[3];
+  const data = new Uint8Array([83, 97, 109, 112, 108, 101, 32, 68, 97, 116, 97]);
 
   describe('transfer', () => {
-    it('should return true for transfer without _data param', async () => {
-      const _to = accounts[1];
-      const _value = 500;
-      await truffleAssertions.passes(this.token.transfer(_to, _value));
+
+    beforeEach('beforeEach: transfer', async () => {
+
+      this.token = await FGToken.new('FGToken', 'FGT', 8, _initialSupply, { from: accountOwner });
+
+      await this.token.addCEO(accountCEO, { from: accountOwner });
+      await this.token.addCFO(accountCFO, { from: accountCEO });
+
+      await this.token.increaseForecast(_initialSupply, { from: accountCFO });
+      await this.token.mint(accountCFO, _initialSupply, { from: accountCFO });
+    });
+    
+    it('should pass transfer', async () => {
+      await truffleAssertions.passes(this.token.transfer(accountAlpha, 500, data, { from: accountCFO }));
     });
 
-    it('should return fail for method transfer when token is paused', async () => {
-      await this.token.pause();
-      await truffleAssertions.fails(this.token.transfer(accounts[1], 500), 'Pausable: paused');
-    });
-
-    it('should return fail for method transfer with param _data when token is paused', async () => {
-      await this.token.pause();
-      await truffleAssertions.fails(this.token.transfer(accounts[1], 500, new Uint8Array([83, 97, 109, 112, 108, 101, 32, 68, 97, 116, 97])), 'Pausable: paused');
+    it('should fail for method transfer when token is paused', async () => {
+      await this.token.pause({ from: accountCEO });
+      await truffleAssertions.fails(this.token.transfer(accountAlpha, 500, data, { from: accountCFO }), 'Pausable: paused');
     });
 
     it('should transfer value of address owner for other account', async () => {
-      const _to = accounts[1];
-      const _value = 500;
-      await this.token.transfer(_to, _value);
-      const balance = await this.token.balanceOf(_to);
-      assert.equal(balance.toNumber(), _value, 'accounts[1] balance is wrong');
+      await truffleAssertions.passes(this.token.transfer(accountAlpha, 500, data, { from: accountCFO }));
+      await truffleAssertions.passes(this.token.transfer(accountBetha, 500, data, { from: accountAlpha }));
     });
 
-    it('should return true for transfer with _data param', async () => {
-      const _to = accounts[1];
-      const _value = 500;
-      const _data = new Uint8Array([83, 97, 109, 112, 108, 101, 32, 68, 97, 116, 97]);
-      await truffleAssertions.passes(this.token.transfer(_to, _value, _data));
-    });
-
-    it('should transfer value of address owner for other account with _data param', async () => {
-      const _to = accounts[1];
-      const _value = 500;
-      const _data = new Uint8Array([83, 97, 109, 112, 108, 101, 32, 68, 97, 116, 97]);
-      await this.token.transfer(_to, _value, _data);
-      const balance = await this.token.balanceOf(_to);
-      assert.equal(balance.toNumber(), _value, 'accounts[1] balance is wrong');
-    });
-
-    it('should substract amount the balances owner', async () => {
-      const amount = 900;
-      const initialBalance = await this.token.balanceOf(accounts[0]);
-      await this.token.transfer(accounts[1], amount);
-      const resultBalance = await this.token.balanceOf(accounts[0]);
-      assert.equal(resultBalance.toNumber(), (initialBalance - amount), 'accounts[0] balance is wrong');
+    it('should substract amount the balances of account', async () => {
+      const initialBalance = await this.token.balanceOf(accountCFO);
+      await this.token.transfer(accountAlpha, 500, data, { from: accountCFO });
+      const resultBalance = await this.token.balanceOf(accountAlpha);
+      assert.equal(resultBalance.toNumber(), (initialBalance - 500), 'accounts[0] balance is wrong');
     });
 
     it('transfer should emit event Transfer', async () => {
-      const _data = new Uint8Array([83, 97, 109, 112, 108, 101, 32, 68, 97, 116, 97]);
-      const _account = accounts[0];
-      const _value = 500;
-      const tx = await this.token.transfer(accounts[1], _value, _data);
+      const tx = await this.token.transfer(accountAlpha, 500, data, { from: accountCFO });
       truffleAssertions.eventEmitted(tx, 'Transfer',
-        ev => ev.from === _account && ev.to === accounts[1] && ev.value.toNumber() === _value,
+        ev => ev.from === accountCFO && ev.to === accountAlpha && ev.value.toNumber() === 500,
         'Transfer should be emitted with correct parameters');
     });
 
     it('transfer of the ERC223 tokens to a balance contract implementing the ERC223 fallback should succeed', async () => {
-      const balanceContract = await BalanceContract.new();
-      const _data = new Uint8Array([83, 97, 109, 112, 108, 101, 32, 68, 97, 116, 97]);
-      const _value = 100;
-      await this.token.transfer(balanceContract.address, _value, _data);
-      expect(await balanceContract.from()).to.equal(accounts[0]);
-      expect(Number(await balanceContract.value())).to.equal(_value);
+      const balanceContract = await BalanceContract.new({ from: accountAlpha });
+      await this.token.transfer(balanceContract.address, 100, data, { from: accountCFO });
+      expect(Number(await balanceContract.value())).to.equal(100);
     });
 
-    it('should revert operation, insuficient funds for transfer without _data param', async () => {
-      const _to = accounts[1];
-      const balance = await this.token.balanceOf(accounts[0]);
+    it('should revert operation, insuficient funds for transfer', async () => {
       const _value = _initialSupply + 500;
-      await truffleAssertions.reverts(this.token.transfer(_to, _value), 'Insuficient funds');
-      expect(balance.toNumber()).to.equal(_initialSupply);
+      await truffleAssertions.reverts(this.token.transfer(accountAlpha, _value, data, { from: accountCFO }), 'Insuficient funds');
     });
 
-    it('should revert operation, insuficient funds for transfer with _data param', async () => {
-      const _to = accounts[1];
-      const _data = new Uint8Array([83, 97, 109, 112, 108, 101, 32, 68, 97, 116, 97]);
-      const balance = await this.token.balanceOf(accounts[0]);
-      const _value = _initialSupply + 500;
-      await truffleAssertions.reverts(this.token.transfer(_to, _value, _data), 'Insuficient funds');
-      expect(balance.toNumber()).to.equal(_initialSupply);
-    });
   });
 });

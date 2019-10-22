@@ -1,41 +1,47 @@
-const FGToken = artifacts.require('FGToken');
+const helpers = require('./helpers');
 const truffleAssertions = require('truffle-assertions');
 
 contract('FGToken', accounts => {
 
-  beforeEach(async () => {
-    this.token = await FGToken.new('FGToken', 'FGT', 8, 1000);
-    await this.token.increaseForecast(1000);
-    await this.token.mint(1000);
+  let listAccounts;
+  let contract;
+
+  beforeEach('beforeEach: transferfrom', async () => {
+
+    listAccounts = helpers.parseAccounts(accounts);
+    contract = await helpers.instanceContract(accounts);
   });
 
   describe('WhitelistAdminRole', () => {
+    
     it('should add new whitelistadmin', async () => {
-      await truffleAssertions.passes(this.token.addWhitelistAdmin(accounts[1]));
+      await truffleAssertions.passes(contract.addWhitelistAdmin(listAccounts.ALPHA, { from: listAccounts.OWNER }));
     });
 
     it('should fail account not whitelistadmin ', async () => {
-      await truffleAssertions.fails(this.token.addWhitelistAdmin(accounts[1], { from: accounts[2] }), 'WhitelistAdminRole: caller does not have the WhitelistAdmin role');
+      await truffleAssertions.fails(contract.addWhitelistAdmin(listAccounts.ALPHA, { from: listAccounts.NOTOWNER }), 'WhitelistAdminRole: caller does not have the WhitelistAdmin role');
     });
 
     it('should add new renounceWhitelistAdmin', async () => {
-      await truffleAssertions.passes(this.token.renounceWhitelistAdmin());
+      await contract.addWhitelistAdmin(listAccounts.ALPHA, { from: listAccounts.OWNER });
+      await truffleAssertions.passes(contract.renounceWhitelistAdmin({ from: listAccounts.ALPHA }));
     });
 
     it('should validate if address is admin of whitelist', async () => {
-      const isWhitelistAdmin = await this.token.isWhitelistAdmin(accounts[0]);
+      await contract.addWhitelistAdmin(listAccounts.ALPHA, { from: listAccounts.OWNER });
+      const isWhitelistAdmin = await contract.isWhitelistAdmin(listAccounts.ALPHA);
       assert.equal(isWhitelistAdmin, true);
     });
 
     it('should emit event WhitelistAdminAdded', async () => {
-      const transaction = await this.token.addWhitelistAdmin(accounts[1]);
-      await truffleAssertions.eventEmitted(transaction, 'WhitelistAdminAdded', ev => ev.account === accounts[1]);
+      const transaction = await contract.addWhitelistAdmin(listAccounts.ALPHA, { from: listAccounts.OWNER });
+      await truffleAssertions.eventEmitted(transaction, 'WhitelistAdminAdded', ev => ev.account === listAccounts.ALPHA);
     });
 
     it('should emit event WhitelistAdminRemoved', async () => {
-      const transaction = await this.token.renounceWhitelistAdmin();
-      await truffleAssertions.eventEmitted(transaction, 'WhitelistAdminRemoved', ev => ev.account === accounts[0]);
+      await contract.addWhitelistAdmin(listAccounts.ALPHA, { from: listAccounts.OWNER });
+      const transaction = await contract.renounceWhitelistAdmin({ from: listAccounts.ALPHA });
+      await truffleAssertions.eventEmitted(transaction, 'WhitelistAdminRemoved', ev => ev.account === listAccounts.ALPHA);
     });
-
   });
 });

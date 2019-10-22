@@ -7,8 +7,10 @@ contract('CFORole', accounts => {
 
   beforeEach(async () => {
     this.contract = await FGToken.new('FGToken', 'FGT', 8, 1000);
-    await this.contract.increaseForecast(1000);
-    await this.contract.mint(accounts[0], 1000);
+  });
+
+  it('should fail ', async () => {
+    await truffleAssertions.fails(this.contract.addCFO(addressCto, { from: addressCto }), 'CEO cant be CFO');
   });
 
   it('should add a new cfo', async () => {

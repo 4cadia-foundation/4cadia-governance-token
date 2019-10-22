@@ -16,10 +16,6 @@ contract CFORole is Context, CEORole {
 
     Roles.Role private CFOs;
 
-    constructor () internal {
-        _addCFO(_msgSender());
-    }
-
     modifier onlyCFO() {
         require(isCFO(_msgSender()), "CFORole: caller does not have the CFO role");
         _;
@@ -30,6 +26,7 @@ contract CFORole is Context, CEORole {
     }
 
     function addCFO(address account) public onlyCEO {
+        require(!isCEO(account), 'CEO cant be CFO');
         _addCFO(account);
     }
 

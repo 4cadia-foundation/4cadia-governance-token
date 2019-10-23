@@ -159,4 +159,12 @@ contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, MaxCapRole, Paus
         return true;
     }
 
+    /**
+    * Ajust Role CFO
+    **/
+    function addCEO(address account) public onlyCEO {
+        require(!isCFO(account), 'CFO cant be CEO');
+        super.addCEO(account);
+    }
+
 }

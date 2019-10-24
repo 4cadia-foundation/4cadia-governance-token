@@ -1,5 +1,5 @@
 # 4Cadia Governance Token
-[![Build Status]()]()
+[![Build Status CircleCI](https://circleci.com/gh/4cadia-foundation/4cadia-governance-token/tree/develop.svg?style=svg)](https://circleci.com/gh/4cadia-foundation/4cadia-governance-token/tree/develop)
 # What is 4Cadia Token?
 4GT is an asset token, collateralized 1:1 to 4CADIA Foundation voting shares through a legal framework.
   - 4GT are issued as ERC223 compatible tokens and can be stored and transacted using any wallet or service that support its integration on the Ethereum network.

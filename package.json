@@ -41,6 +41,7 @@
     "eslint-plugin-standard": "^3.1.0",
     "eth-gas-reporter": "^0.2.12",
     "solhint": "2.1.0",
+    "truffle": "^5.0.41",
     "truffle-assertions": "^0.9.1",
     "truffle-flattener": "^1.4.2"
   }

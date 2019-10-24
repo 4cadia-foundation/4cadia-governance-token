@@ -50,6 +50,11 @@ Running unit test:
 ```sh
 $ ~/4cadia-governance-token/npm test
 ```
+
+#### Deployment
+- Version: 0.2.0
+- Latest post on Rinkeby TestNet. [EtherScan](https://rinkeby.etherscan.io/address/0x30d1c8c44ae4524b1050a64159953b0adca04aac#code)
+
 ### References
 - [Tech](./docs/tecnologies.md)
 - [Git Workflow](./docs/workflow.md)

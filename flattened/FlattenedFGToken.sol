@@ -403,10 +403,6 @@ contract CFORole is Context, CEORole {
 
     Roles.Role private CFOs;
 
-    constructor () internal {
-        _addCFO(_msgSender());
-    }
-
     modifier onlyCFO() {
         require(isCFO(_msgSender()), "CFORole: caller does not have the CFO role");
         _;
@@ -417,6 +413,7 @@ contract CFORole is Context, CEORole {
     }
 
     function addCFO(address account) public onlyCEO {
+        require(!isCEO(account), 'CEO cant be CFO');
         _addCFO(account);
     }
 
@@ -433,6 +430,161 @@ contract CFORole is Context, CEORole {
         CFOs.remove(account);
         emit CFORemoved(account);
     }
+}
+
+// File: contracts/access/roles/MaxCapRole.sol
+
+pragma solidity ^0.5.1;
+
+
+
+
+/**
+ * @title Manager maxcap feature
+ * @dev Manager are responsible for MaxCap Token.
+ */
+contract MaxCapRole is Context, CEORole {
+    using Roles for Roles.Role;
+
+    event MaxCapManagerAdded(address indexed account);
+    event MaxCapManagerRemoved(address indexed account);
+
+    Roles.Role private _managers;
+
+    constructor () internal {
+        _addMaxCapManager(_msgSender());
+    }
+
+    modifier onlyMaxCapManager() {
+        require(isMaxCapManager(_msgSender()), "MaxCapManager: caller does not have the MaxCap role");
+        _;
+    }
+
+    function isMaxCapManager(address account) public view returns (bool) {
+        return _managers.has(account);
+    }
+
+    function addMaxCapManager(address account) public onlyCEO {
+        _addMaxCapManager(account);
+    }
+
+    function renounceMaxCapManager() public {
+        _removeMaxCapManager(_msgSender());
+    }
+
+    function _addMaxCapManager(address account) internal {
+        _managers.add(account);
+        emit MaxCapManagerAdded(account);
+    }
+
+    function _removeMaxCapManager(address account) internal {
+        _managers.remove(account);
+        emit MaxCapManagerRemoved(account);
+    }
+}
+
+// File: contracts/access/roles/WhitelistAdminRole.sol
+
+pragma solidity ^0.5.1;
+
+
+
+/**
+ * @title WhitelistAdminRole
+ * @dev WhitelistAdmins are responsible for assigning and removing Whitelisted accounts.
+ */
+contract WhitelistAdminRole is Context {
+    using Roles for Roles.Role;
+
+    event WhitelistAdminAdded(address indexed account);
+    event WhitelistAdminRemoved(address indexed account);
+
+    Roles.Role private _whitelistAdmins;
+
+    constructor () internal {
+        _addWhitelistAdmin(_msgSender());
+    }
+
+    modifier onlyWhitelistAdmin() {
+        require(isWhitelistAdmin(_msgSender()), "WhitelistAdminRole: caller does not have the WhitelistAdmin role");
+        _;
+    }
+
+    function isWhitelistAdmin(address account) public view returns (bool) {
+        return _whitelistAdmins.has(account);
+    }
+
+    function addWhitelistAdmin(address account) public onlyWhitelistAdmin {
+        _addWhitelistAdmin(account);
+    }
+
+    function renounceWhitelistAdmin() public {
+        _removeWhitelistAdmin(_msgSender());
+    }
+
+    function _addWhitelistAdmin(address account) internal {
+        _whitelistAdmins.add(account);
+        emit WhitelistAdminAdded(account);
+    }
+
+    function _removeWhitelistAdmin(address account) internal {
+        _whitelistAdmins.remove(account);
+        emit WhitelistAdminRemoved(account);
+    }
+}
+
+// File: contracts/access/roles/WhitelistedRole.sol
+
+pragma solidity ^0.5.1;
+
+
+
+
+/**
+ * @title WhitelistedRole
+ * @dev Whitelisted accounts have been approved by a WhitelistAdmin to perform certain actions (e.g. participate in a
+ * crowdsale). This role is special in that the only accounts that can add it are WhitelistAdmins (who can also remove
+ * it), and not Whitelisteds themselves.
+ */
+contract WhitelistedRole is Context, WhitelistAdminRole {
+    using Roles for Roles.Role;
+
+    event WhitelistedAdded(address indexed account);
+    event WhitelistedRemoved(address indexed account);
+
+    Roles.Role private _whitelisteds;
+
+    modifier onlyWhitelisted() {
+        require(isWhitelisted(_msgSender()), "WhitelistedRole: caller does not have the Whitelisted role");
+        _;
+    }
+
+    function isWhitelisted(address account) public view returns (bool) {
+        return _whitelisteds.has(account);
+    }
+
+    function addwhitelist(address account) public onlyWhitelistAdmin {
+        _addWhitelisted(account);
+    }
+
+    function removeWhitelist(address account) public onlyWhitelistAdmin {
+        _removeWhitelist(account);
+    }
+
+    function renounceWhitelist() public {
+        _removeWhitelist(_msgSender());
+    }
+
+    function _addWhitelisted(address account) internal {
+        _whitelisteds.add(account);
+        emit WhitelistedAdded(account);
+    }
+
+    function _removeWhitelist(address account) internal {
+        _whitelisteds.remove(account);
+        emit WhitelistedRemoved(account);
+    }
+
 }
 
 // File: contracts/token/Pausable.sol
@@ -572,7 +724,7 @@ pragma solidity ^0.5.1;
 
 
 
-contract MaxCap is CEORole, Pausable {
+contract MaxCap is MaxCapRole, Pausable {
 
     using SafeMath for uint;
 
@@ -584,7 +736,7 @@ contract MaxCap is CEORole, Pausable {
         return maxCap_;
     }
 
-    function increaseMaxCap (uint256 _value) public whenNotPaused onlyCEO returns(bool success) {
+    function increaseMaxCap (uint256 _value) public whenNotPaused onlyMaxCapManager returns(bool success) {
        require(_value != 0, 'value not zero');
        uint256 oldValue = maxCap_;
        maxCap_ = maxCap_.add(_value);
@@ -592,7 +744,7 @@ contract MaxCap is CEORole, Pausable {
        return true;
     }
 
-    function decreaseMaxCap (uint256 _value) public whenNotPaused onlyCEO returns(bool success) {
+    function decreaseMaxCap (uint256 _value) public whenNotPaused onlyMaxCapManager returns(bool success) {
         require(_value != 0, 'value not zero');
         require(_value <= maxCap_, 'value cannot be greater than maxCap');
         uint256 oldValue = maxCap_;
@@ -616,10 +768,12 @@ pragma solidity ^0.5.1;
 
 
 
+
+
 /**
  * @title Reference implementation of the ERC223 standard token.
  */
-contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, Pausable, MaxCap, Announcement{
+contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, MaxCapRole, Pausable, MaxCap, Announcement, WhitelistedRole {
 
     using SafeMath for uint;
 
@@ -657,7 +811,7 @@ contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, Pausable, MaxCap
         return true;
     }
 
-     function transfer(address _to, uint _value, bytes memory _data) public whenNotPaused returns (bool success){
+    function transfer(address _to, uint _value, bytes memory _data) public whenNotPaused returns (bool success){
         _transfer(_msgSender(), _to, _value, _data);
         return true;
     }
@@ -718,18 +872,19 @@ contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, Pausable, MaxCap
      *
      * - the caller must have the {MinterRole}.
      */
-    function mint(uint256 amount) public onlyCFO whenNotPaused {
-        _mint(_msgSender(), amount);
+    function mint(address _account, uint256 amount) public onlyCFO whenNotPaused {
+        _mint(_account, amount);
     }
 
     function _mint(address _account, uint256 _amount) internal {
         require(_account != address(0), "ERC20: mint to the zero address");
         require(_amount <= forecast_, "amount must be less than forecast value");
-
+  
         bytes memory empty = hex"00000000";
 
         balances[_account] = balances[_account].add(_amount);
         _totalSupply = _totalSupply.add(_amount);
+        forecast_ = forecast_.sub(_amount);
 
         emit Mint(_account, _amount);
         emit Transfer(address(0), _account, _amount, empty);

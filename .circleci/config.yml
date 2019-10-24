@@ -8,7 +8,7 @@ jobs:
       - image: circleci/node:9.11.1
 
       - image: trufflesuite/ganache-cli
-        command: ganache-cli -i 1234 -e 100000000000 -l 4700038
+        command: ganache-cli -i 1234 -e 100000000000
 
     working_directory: ~/repo
 
@@ -19,8 +19,8 @@ jobs:
 
       - restore_cache:
           keys:
-          - v1-dependencies-{{ checksum "package.json" }}
-          - v1-dependencies-
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
 
       - run:
           name: Install! 
@@ -32,5 +32,5 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       - run:
-        name: Tests 
-        command: npm test
+          name: Tests 
+          command: npm test

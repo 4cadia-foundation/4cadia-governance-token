@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.1;
 
 import "../utils/Context.sol";
 import "./IERC20.sol";
@@ -114,7 +114,7 @@ contract Crowdsale is Context, ReentrancyGuard {
 
         // calculate token amount to be created
         uint256 tokens = _getTokenAmount(weiAmount);
-
+        
         // update state
         _weiRaised = _weiRaised.add(weiAmount);
 

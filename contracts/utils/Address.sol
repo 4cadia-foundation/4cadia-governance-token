@@ -14,6 +14,8 @@ library Address {
      * > It is unsafe to assume that an address for which this function returns
      * false is an externally-owned account (EOA) and not a contract.
      */
+
+     /*
     function isContract(address account) internal view returns (bool) {
         // This method relies in extcodesize, which returns 0 for contracts in
         // construction, since the code is only stored at the end of the
@@ -24,6 +26,7 @@ library Address {
         assembly { size := extcodesize(account) }
         return size > 0;
     }
+    */
 
     /**
      * @dev Converts an `address` into `address payable`. Note that this is

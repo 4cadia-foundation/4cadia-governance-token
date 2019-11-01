@@ -1,8 +1,6 @@
 pragma solidity ^0.5.1;
 
-import "../../utils/Context.sol";
-import "../Roles.sol";
-import "./WhitelistAdminRole.sol";
+import "./ComplianceRole.sol";
 
 /**
  * @title WhitelistedRole
@@ -10,16 +8,16 @@ import "./WhitelistAdminRole.sol";
  * crowdsale). This role is special in that the only accounts that can add it are WhitelistAdmins (who can also remove
  * it), and not Whitelisteds themselves.
  */
-contract WhitelistedRole is Context, WhitelistAdminRole {
+contract WhitelistedRole is ComplianceRole {
     using Roles for Roles.Role;
+
+    Roles.Role private _whitelisteds;
 
     event WhitelistedAdded(address indexed account);
     event WhitelistedRemoved(address indexed account);
 
-    Roles.Role private _whitelisteds;
-
     modifier onlyWhitelisted() {
-        require(isWhitelisted(_msgSender()), "WhitelistedRole: caller does not have the Whitelisted role");
+        require(isWhitelisted(msg.sender), "WhitelistedRole: onlyWhitelisted");
         _;
     }
 
@@ -27,16 +25,16 @@ contract WhitelistedRole is Context, WhitelistAdminRole {
         return _whitelisteds.has(account);
     }
 
-    function addwhitelist(address account) public onlyWhitelistAdmin {
+    function addWhitelist(address account) public onlyCompliance {
         _addWhitelisted(account);
     }
 
-    function removeWhitelist(address account) public onlyWhitelistAdmin {
+    function removeWhitelist(address account) public onlyCompliance {
         _removeWhitelist(account);
     }
 
     function renounceWhitelist() public {
-        _removeWhitelist(_msgSender());
+        _removeWhitelist(msg.sender);
     }
 
     function _addWhitelisted(address account) internal {

@@ -1,6 +1,6 @@
 pragma solidity ^0.5.1;
 
-import "../access/roles/CEORole.sol";
+import "../access/roles/CeoCfoRole.sol";
 
 /**
  * @dev Contract module which allows children to implement an emergency stop
@@ -11,7 +11,7 @@ import "../access/roles/CEORole.sol";
  * the functions of your contract. Note that they will not be pausable by
  * simply including this module, only once the modifiers are put in place.
  */
-contract Pausable is CEORole {
+contract Pausable is CeoCfoRole {
     /**
      * @dev Emitted when the pause is triggered by a pauser (`account`).
      */

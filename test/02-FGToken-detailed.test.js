@@ -2,7 +2,7 @@ const FGToken = artifacts.require('FGToken');
 
 const {
   name, symbol, decimals, maxCap
-} = require('./dataTest'); 
+} = require('./helpers'); 
 
 
 contract('FGToken', () => {

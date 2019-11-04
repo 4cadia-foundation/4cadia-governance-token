@@ -3,11 +3,9 @@ const FGToken = artifacts.require('FGToken');
 const truffleAssertions = require('truffle-assertions');
 
 const {
-  name, symbol, decimals, maxCap
-} = require('./dataTest');  
+  name, symbol, decimals, maxCap, forecastAmount, amount
+} = require('./helpers');  
 
-const forecastAmount = 200 * 10 ** decimals;
-const amount = 100 * 10 ** decimals;
 
 contract('FGToken', accounts => {
 

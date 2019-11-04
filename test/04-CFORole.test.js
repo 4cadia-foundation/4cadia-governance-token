@@ -4,7 +4,7 @@ const truffleAssertions = require('truffle-assertions');
 
 const {
   name, symbol, decimals, maxCap
-} = require('./dataTest'); 
+} = require('./helpers'); 
 
 
 contract('CeoCfoRole', accounts => {

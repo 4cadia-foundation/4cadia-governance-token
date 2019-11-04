@@ -1,7 +1,6 @@
 pragma solidity ^0.5.1;
 
 import "./IERC223.sol";
-
 import "./IERC223Recipient.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
@@ -14,11 +13,10 @@ import "../utils/Address.sol";
 /**
  * @title Reference implementation of the ERC223 standard token.
  */
-//contract FGToken is IERC223, FGTokenDetailed, CEORole, CFORole, MaxCapRole, Pausable, MaxCap, WhitelistedRole {
-contract FGToken is IERC20, IERC223, ERC20Detailed, CeoCfoRole, MaxCapRole, Pausable, ComplianceRole, WhitelistedRole {
+contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, ComplianceRole, WhitelistedRole {
     using SafeMath for uint256;
 
-    mapping(address => uint256) balances;
+    mapping(address => uint256) _balances;
     mapping (address => mapping (address => uint256)) private _allowances;
     uint256 private _totalSupply;
     uint256 private _maxCap;
@@ -31,12 +29,16 @@ contract FGToken is IERC20, IERC223, ERC20Detailed, CeoCfoRole, MaxCapRole, Paus
     event MaxCapChange (uint256 oldValue, uint256 newValue);
 
     constructor (
-        string memory _name, string memory _symbol,
-        uint8 _decimals, uint256 _maxCapValue)
+        string memory _name, string memory _symbol, uint8 _decimals, uint256 _maxCapValue)
         ERC20Detailed(_name, _symbol, _decimals) public {
-        _maxCap = _maxCapValue;
+        increaseMaxCap(_maxCapValue);
         _forecast = 0;
         _totalSupply = 0;
+    }
+
+
+    function totalSupply() public view returns (uint256) {
+        return _totalSupply;
     }
 
     /**
@@ -46,11 +48,7 @@ contract FGToken is IERC20, IERC223, ERC20Detailed, CeoCfoRole, MaxCapRole, Paus
      * @return balance Balance of the `_owner`.
      */
     function balanceOf(address _owner) public view returns (uint256) {
-        return balances[_owner];
-    }
-
-    function totalSupply() public view returns (uint256) {
-        return _totalSupply;
+        return _balances[_owner];
     }
 
     function forecast() public view returns (uint256) {
@@ -61,92 +59,35 @@ contract FGToken is IERC20, IERC223, ERC20Detailed, CeoCfoRole, MaxCapRole, Paus
         return _maxCap;
     }
 
-    // ERC223 Transfer to a contract or externally-owned account
-    function transfer(address to, uint value, bytes memory data) public whenNotPaused returns (bool success) {
-        if(isContract(to)) {
-            return transferToContract(to, value, data);
-        }
-        else {
-            return transferToAddress(to, value, data);
-        }
-    }
-
     // Standard function transfer similar to ERC20 transfer with no _data
     // Added due to backwards compatibility reasons
-    function transfer(address to, uint value) public whenNotPaused returns (bool success) {
-        //standard function transfer similar to ERC20 transfer with no _data
-        //added due to backwards compatibility reasons
+    function transfer(address _to, uint _value) public whenNotPaused returns (bool) {
         bytes memory empty;
-        if(isContract(to)) {
-            return transferToContract(to, value, empty);
-        }
-        else {
-            return transferToAddress(to, value, empty);
-        }
-    }
-
-    // ERC223 fetch contract size (must be nonzero to be a contract)
-    //assemble the given address bytecode. If bytecode exists then the _address is a contract
-    function isContract(address _address) private view returns (bool) {
-        // This method relies in extcodesize, which returns 0 for contracts in
-        // construction, since the code is only stored at the end of the
-        // constructor execution.
-        uint256 length;
-        assembly {
-                //retrieve the size of the code on target address, this needs assembly
-                length := extcodesize(_address)
-        }
-        return (length > 0);
-    }
-
-    //function that is called when transaction target is an address
-    function transferToAddress(address to, uint value, bytes memory data) private returns (bool success) {
-        require(to != address(0), "ERC223: transfer to the zero address");
-        require(balanceOf(msg.sender) >= value, "insuficient funds");
-        balances[msg.sender] = balances[msg.sender].sub(value);
-        balances[to] = balances[to].add(value);
-        emit Transfer(msg.sender, to, value, data);
+        _transfer(msg.sender, _to, _value, empty);
         return true;
     }
 
-    // ERC223 Transfer to contract and invoke tokenFallback() method
-    //function that is called when transaction target is a contract
-    function transferToContract(address to, uint value, bytes memory data) private returns (bool success) {
-        require(to != address(0), "ERC223: transfer to the zero address");
-        require(balanceOf(msg.sender) >= value, "insuficient funds");
-        balances[msg.sender] = balances[msg.sender].sub(value);
-        balances[to] = balances[to].add(value);
-
-        IERC223Recipient receiver = IERC223Recipient(to);
-        receiver.tokenFallback(msg.sender, value, data);
-        emit Transfer(msg.sender, to, value, data);
+    // ERC223 Transfer to a contract or externally-owned account
+    function transfer(address _to, uint _value, bytes memory _data) public whenNotPaused returns (bool) {
+        _transfer(msg.sender, _to, _value, _data);
         return true;
     }
 
-    
+    function _transfer(address _from, address _to, uint _value, bytes memory _data) internal {
+        require(_from != address(0), "ERC223: transfer from the zero address");
+        require(_to != address(0), "ERC223: transfer to the zero address");
+        require(_value <= _balances[_from], "insuficient funds");
 
+        _balances[_from] = _balances[_from].sub(_value);
+        _balances[_to] = _balances[_to].add(_value);
 
-    function _transfer(address sender, address to, uint value, bytes memory data) internal {
-        require(sender != address(0), "ERC223: transfer from the zero address");
-        require(to != address(0), "ERC223: transfer to the zero address");
-        require(balances[sender] >= value, "insuficient funds");
-
-        balances[sender] = balances[sender].sub(value);
-        balances[to] = balances[to].add(value);
-
-        if(isContract(to)) {
-            IERC223Recipient receiver = IERC223Recipient(to);
-            receiver.tokenFallback(sender, value, data);
+        if(Address.isContract(_to)) {
+            IERC223Recipient receiver = IERC223Recipient(_to);
+            receiver.tokenFallback(_from, _value, _data);
         }
-        emit Transfer(sender, to, value, data);
+        emit Transfer(_from, _to, _value, _data);
     }
 
-    function transferFrom(address _sender, address _to, uint256 _amount) public whenNotPaused returns (bool) {
-        bytes memory empty = "";
-        _transfer(_sender, _to, _amount, empty);
-        _approve(_sender, msg.sender, _allowances[_sender][msg.sender].sub(_amount));
-        return true;
-    }
 
     function allowance(address owner, address spender) public view returns (uint256) {
         return _allowances[owner][spender];
@@ -179,28 +120,36 @@ contract FGToken is IERC20, IERC223, ERC20Detailed, CeoCfoRole, MaxCapRole, Paus
         return true;
     }
 
+    function transferFrom(address _from, address _to, uint256 _amount) public whenNotPaused returns (bool) {
+        bytes memory empty;
+        _transfer(_from, _to, _amount, empty);
+        _approve(_from, msg.sender, _allowances[_from][msg.sender].sub(_amount));
+        return true;
+    }
+
+
+
     /**
      * @dev See {ERC20-_mint}.
      *
      * Requirements:
      *
-     * - the caller must have the {MinterRole}.
+     * - the caller must have the {CFORole}.
      */
-    function mint(address _account, uint256 amount) public onlyCFO whenNotPaused {
-        _mint(_account, amount);
+    function mint(address _account, uint256 _amount) public onlyCFO whenNotPaused {
+        _mint(_account, _amount);
     }
 
     function _mint(address _account, uint256 _amount) internal {
         require(_account != address(0), "ERC20: mint to the zero address");
         require(_amount <= _forecast, "amount must be less than forecast value");
-  
-        bytes memory empty = hex"00000000";
 
-        balances[_account] = balances[_account].add(_amount);
+        _balances[_account] = _balances[_account].add(_amount);
         _totalSupply = _totalSupply.add(_amount);
         _forecast = _forecast.sub(_amount);
 
         emit Mint(_account, _amount);
+        bytes memory empty;
         emit Transfer(address(0), _account, _amount, empty);
     }
 
@@ -208,54 +157,54 @@ contract FGToken is IERC20, IERC223, ERC20Detailed, CeoCfoRole, MaxCapRole, Paus
         _burn(msg.sender, _amount);
     }
 
-    function _burn(address _who, uint256 _amount) internal  {
-        require(_amount <= balances[_who], "insuficient funds");
-        bytes memory empty = hex"00000000";
+    function _burn(address _from, uint256 _amount) internal  {
+        require(_amount <= _balances[_from], "insuficient funds");
 
-        balances[_who] = balances[_who].sub(_amount);
+        _balances[_from] = _balances[_from].sub(_amount);
         _totalSupply = _totalSupply.sub(_amount);
 
-        emit Burn(_who, _amount);
-        emit Transfer(_who, address(0), _amount, empty);
+        emit Burn(_from, _amount);
+        bytes memory empty;
+        emit Transfer(_from, address(0), _amount, empty);
     }
 
-    function increaseMaxCap (uint256 value) public whenNotPaused onlyMaxCapManager returns(bool) {
+
+    function increaseMaxCap (uint256 _value) public whenNotPaused onlyMaxCapManager returns(bool) {
        uint256 oldValue = _maxCap;
-       _maxCap = _maxCap.add(value);
+       _maxCap = _maxCap.add(_value);
        emit MaxCapChange(oldValue, _maxCap);
        return true;
     }
 
-    function decreaseMaxCap (uint256 value) public whenNotPaused onlyMaxCapManager returns(bool) {
-        require((_maxCap - value) >= _totalSupply, 'FGToken: maxCap less than totalSupply');
+    function decreaseMaxCap (uint256 _value) public whenNotPaused onlyMaxCapManager returns(bool) {
+        require((_maxCap - _value) >= _totalSupply, 'FGToken: maxCap less than totalSupply');
         uint256 oldValue = _maxCap;
-        _maxCap = _maxCap.sub(value);
+        _maxCap = _maxCap.sub(_value);
         emit MaxCapChange(oldValue, _maxCap);
         return true;
     }
 
     /**
     * @dev increment forecast value
-    * @param value The amount to be increment.
+    * @param _value The amount to be increment.
     */
-    function increaseForecast(uint256 value) public whenNotPaused onlyCFO returns (bool) {
-        uint256 total = forecast() + value + _totalSupply;
-        require(total <= maxCap(), 'FGToken: forecast greater than maxCap');
+    function increaseForecast(uint256 _value) public whenNotPaused onlyCFO returns (bool) {
+        require((forecast() + _value + _totalSupply) <= maxCap(), 'FGToken: forecast greater than maxCap');
         uint256 oldValue = _forecast;
-        _forecast = _forecast.add(value);
+        _forecast = _forecast.add(_value);
         emit ForecastChange(oldValue, _forecast);
         return true;
     }
 
     /**
     * @dev decrement forecast value
-    * @param value The amount to be decremented.
+    * @param _value The amount to be decremented.
     */
-    function decreaseForecast(uint256 value) public whenNotPaused onlyCFO returns (bool)  {
+    function decreaseForecast(uint256 _value) public whenNotPaused onlyCFO returns (bool)  {
         uint256 oldValue = _forecast;
-        _forecast = _forecast.sub(value);
+        _forecast = _forecast.sub(_value);
         emit ForecastChange(oldValue, _forecast);
         return true;
     }
-
+    
 }

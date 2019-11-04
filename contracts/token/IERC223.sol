@@ -19,19 +19,19 @@ contract IERC223 {
     /**
      * @dev Returns the balance of the `who` address.
      */
-    function balanceOf(address who) public view returns (uint256);
+    function balanceOf(address who) external view returns (uint256);
         
     /**
      * @dev Transfers `value` tokens from `msg.sender` to `to` address
      * and returns `true` on success.
      */
-    function transfer(address to, uint256 value) public returns (bool success);
+    function transfer(address to, uint256 value) external returns (bool success);
         
     /**
      * @dev Transfers `value` tokens from `msg.sender` to `to` address with `data` parameter
      * and returns `true` on success.
      */
-    function transfer(address to, uint256 value, bytes memory data) public returns (bool success);
+    function transfer(address to, uint256 value, bytes calldata data) external returns (bool success);
      
      /**
      * @dev Event that is fired on successful transfer.

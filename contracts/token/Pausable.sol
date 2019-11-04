@@ -9,7 +9,8 @@ import "../access/roles/CeoCfoRole.sol";
  * This module is used through inheritance. It will make available the
  * modifiers `whenNotPaused` and `whenPaused`, which can be applied to
  * the functions of your contract. Note that they will not be pausable by
- * simply including this module, only once the modifiers are put in place.
+ * simply including this module, only once the modifiers are put in place. *
+ * Based in: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/lifecycle/Pausable.sol
  */
 contract Pausable is CeoCfoRole {
     /**

@@ -4,7 +4,7 @@ pragma solidity ^0.5.1;
  * @title Contract that will work with ERC223 tokens.
  */
  
-contract IERC223Recipient { 
+contract IERC223Recipient {
 /**
  * @dev Standard ERC223 function that will handle incoming token transfers.
  *

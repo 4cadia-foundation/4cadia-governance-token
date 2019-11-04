@@ -1,6 +1,6 @@
 pragma solidity ^0.5.1;
 
-import "../access/roles/CEORole.sol";
+import "../access/roles/CeoCfoRole.sol";
 
 /**
  * @dev Contract module which allows children to implement an emergency stop
@@ -9,9 +9,10 @@ import "../access/roles/CEORole.sol";
  * This module is used through inheritance. It will make available the
  * modifiers `whenNotPaused` and `whenPaused`, which can be applied to
  * the functions of your contract. Note that they will not be pausable by
- * simply including this module, only once the modifiers are put in place.
+ * simply including this module, only once the modifiers are put in place. *
+ * Based in: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/lifecycle/Pausable.sol
  */
-contract Pausable is CEORole {
+contract Pausable is CeoCfoRole {
     /**
      * @dev Emitted when the pause is triggered by a pauser (`account`).
      */

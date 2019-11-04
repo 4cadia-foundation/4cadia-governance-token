@@ -27,7 +27,7 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/janusplatform/4cadia.governance.token#readme",
   "dependencies": {
-    "@openzeppelin/contracts": "^2.3.0",
+    "@openzeppelin/contracts": "2.3.0",
     "bignumber.js": "^9.0.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",

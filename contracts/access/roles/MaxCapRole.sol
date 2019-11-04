@@ -1,27 +1,25 @@
 pragma solidity ^0.5.1;
 
-import "../../utils/Context.sol";
-import "../Roles.sol";
-import "./CEORole.sol";
+import "./CeoCfoRole.sol";
 
 /**
  * @title Manager maxcap feature
  * @dev Manager are responsible for MaxCap Token.
  */
-contract MaxCapRole is Context, CEORole {
+contract MaxCapRole is CeoCfoRole {
     using Roles for Roles.Role;
+
+    Roles.Role private _managers;
 
     event MaxCapManagerAdded(address indexed account);
     event MaxCapManagerRemoved(address indexed account);
 
-    Roles.Role private _managers;
-
     constructor () internal {
-        _addMaxCapManager(_msgSender());
+        _addMaxCapManager(msg.sender);
     }
 
     modifier onlyMaxCapManager() {
-        require(isMaxCapManager(_msgSender()), "MaxCapManager: caller does not have the MaxCap role");
+        require(isMaxCapManager(msg.sender), "MaxCapRole: onlyMaxCapManager");
         _;
     }
 
@@ -33,8 +31,12 @@ contract MaxCapRole is Context, CEORole {
         _addMaxCapManager(account);
     }
 
+    function removeMaxCapManager(address account) public onlyCEO {
+        _removeMaxCapManager(account);
+    }
+
     function renounceMaxCapManager() public {
-        _removeMaxCapManager(_msgSender());
+        _removeMaxCapManager(msg.sender);
     }
 
     function _addMaxCapManager(address account) internal {

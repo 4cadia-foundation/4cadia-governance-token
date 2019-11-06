@@ -1,10 +1,9 @@
-pragma solidity ^0.5.1;
+pragma solidity ^0.5.0;
 
-import "../utils/Context.sol";
-import "./IERC20.sol";
-import "../math/SafeMath.sol";
-import "./SafeERC20.sol";
-import "../utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
  * @title Crowdsale
@@ -18,7 +17,7 @@ import "../utils/ReentrancyGuard.sol";
  * the methods to add functionality. Consider using 'super' where appropriate to concatenate
  * behavior.
  */
-contract Crowdsale is Context, ReentrancyGuard {
+contract Crowdsale is ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -71,7 +70,7 @@ contract Crowdsale is Context, ReentrancyGuard {
      * buyTokens directly when purchasing tokens from a contract.
      */
     function () external payable {
-        buyTokens(_msgSender());
+        buyTokens(msg.sender);
     }
 
     /**
@@ -114,12 +113,12 @@ contract Crowdsale is Context, ReentrancyGuard {
 
         // calculate token amount to be created
         uint256 tokens = _getTokenAmount(weiAmount);
-        
+
         // update state
         _weiRaised = _weiRaised.add(weiAmount);
 
         _processPurchase(beneficiary, tokens);
-        emit TokensPurchased(_msgSender(), beneficiary, weiAmount, tokens);
+        emit TokensPurchased(msg.sender, beneficiary, weiAmount, tokens);
 
         _updatePurchasingState(beneficiary, weiAmount);
 
@@ -139,7 +138,6 @@ contract Crowdsale is Context, ReentrancyGuard {
     function _preValidatePurchase(address beneficiary, uint256 weiAmount) internal view {
         require(beneficiary != address(0), "Crowdsale: beneficiary is the zero address");
         require(weiAmount != 0, "Crowdsale: weiAmount is 0");
-        this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
     }
 
     /**

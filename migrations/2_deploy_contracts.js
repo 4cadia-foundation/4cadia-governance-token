@@ -1,7 +1,14 @@
 const FGToken = artifacts.require('FGToken');
-const CrowdsaleContract = artifacts.require('Crowdsale');
+const FGTokenCrowdsale = artifacts.require('FGTokenCrowdsale');
+const { BN, ether, time } = require('@openzeppelin/test-helpers');
 
-module.exports = async (deployer, network, accounts) => {
-  await deployer.deploy(FGToken, 'FGToken', 'FGT', 8, 1000);
-  await deployer.deploy(CrowdsaleContract, 1, '0x2aca7f45a401cdd40ac745248272270095f69ba4', FGToken.address);
+module.exports = async (deployer, network, [wallet]) => {
+  const RATE = new BN(10);
+  const CAP = ether('20');
+
+  const openingTime = (await time.latest()).add(time.duration.weeks(1));
+  const closingTime = openingTime.add(time.duration.weeks(1));
+
+  await deployer.deploy(FGToken, 'FGToken', 'FGT', 8, 100000000000);
+  await deployer.deploy(FGTokenCrowdsale, openingTime, closingTime, RATE, CAP, wallet, FGToken.address);
 };

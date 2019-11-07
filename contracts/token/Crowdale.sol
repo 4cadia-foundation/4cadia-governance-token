@@ -114,6 +114,8 @@ contract Crowdsale is ReentrancyGuard {
         // calculate token amount to be created
         uint256 tokens = _getTokenAmount(weiAmount);
 
+        tokens = tokens.div(10**10);
+
         // update state
         _weiRaised = _weiRaised.add(weiAmount);
 

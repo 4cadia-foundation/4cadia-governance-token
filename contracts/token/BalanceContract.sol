@@ -4,14 +4,9 @@ import "./IERC223Recipient.sol";
 
 contract BalanceContract is IERC223Recipient {
 
-    address owner;
     address public from;
     uint public value;
-    bytes data;
-
-    constructor () public {
-        owner = msg.sender;
-    }
+    bytes public data;
 
     function tokenFallback(address _from, uint _value, bytes memory _data) public {
         from = _from;

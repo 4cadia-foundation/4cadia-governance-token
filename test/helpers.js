@@ -1,5 +1,4 @@
 const BigNumber = require('bignumber.js');
-const ContractToken = artifacts.require('FGToken');
 
 const should = require('chai')
   .use(require('chai-as-promised'))
@@ -10,26 +9,25 @@ const expect = require('chai').expect;
 
 const parseAccounts = (list) => {
   return {
-    OWNER: list[0],
-    CEO: list[1],
-    CFO: list[2],
-    ALPHA: list[3],
-    BETA: list[4],
-    GAMMA: list[5],
-    NOTOWNER: list[6]
+    Creator: list[0],
+    OtherAddress: list[1],
+    CEO: list[2],
+    CFO: list[3],
+    MaxCapManager: list[4],
+    Compliance: list[5],
+    Whitelisted: list[6],
+    User: list[7],
+    User2: list[8]
   };
 };
 
-const descriptionSample = () => {
-  return new Uint8Array([83, 97, 109, 112, 108, 101, 32, 68, 97, 116, 97]);
-};
+const name = 'FGToken';
+const symbol = 'FGT';
+const decimals = 8;
+const maxCap = 1000 * 10 ** decimals;
+const forecastAmount = 200 * 10 ** decimals;
+const amount = 100 * 10 ** decimals;
+const data = new Uint8Array([83, 97, 109, 112, 108, 101, 32, 68, 97, 116, 97]);
+const empty = new  Uint8Array([0]);
 
-const instanceContract = async (list) => {
-  const accounts = parseAccounts(list);
-  const contract = await ContractToken.new('FGToken', 'FGT', 8, 1000, { from: accounts.OWNER });
-  await contract.addCEO(accounts.CEO, { from: accounts.OWNER });
-  await contract.addCFO(accounts.CFO, { from: accounts.CEO });
-  return contract;
-};
-
-module.exports = { should, expect, instanceContract, parseAccounts, descriptionSample };
+module.exports = { should, expect, parseAccounts, name, symbol, decimals, maxCap, forecastAmount, amount, data, empty };

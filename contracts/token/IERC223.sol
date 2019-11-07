@@ -12,29 +12,29 @@ pragma solidity ^0.5.1;
 
 contract IERC223 {
     /**
-     * @dev Returns the total supply of the token.
+     * @dev Returns the amount of tokens in existence.
      */
-    uint public _totalSupply;
+    function totalSupply() external view returns (uint256);
     
     /**
      * @dev Returns the balance of the `who` address.
      */
-    function balanceOf(address who) public view returns (uint);
+    function balanceOf(address who) external view returns (uint256);
         
     /**
      * @dev Transfers `value` tokens from `msg.sender` to `to` address
      * and returns `true` on success.
      */
-    function transfer(address to, uint value) public returns (bool success);
+    function transfer(address to, uint256 value) external returns (bool success);
         
     /**
      * @dev Transfers `value` tokens from `msg.sender` to `to` address with `data` parameter
      * and returns `true` on success.
      */
-    function transfer(address to, uint value, bytes memory data) public returns (bool success);
+    function transfer(address to, uint256 value, bytes calldata data) external returns (bool success);
      
      /**
      * @dev Event that is fired on successful transfer.
      */
-    event Transfer(address indexed from, address indexed to, uint value, bytes data);
+    event Transfer(address indexed from, address indexed to, uint256 value, bytes data);
 }

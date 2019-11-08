@@ -36,7 +36,7 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
         _totalSupply = 0;
     }
 
-
+   
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
@@ -136,7 +136,7 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
      *
      * - the caller must have the {CFORole}.
      */
-    function mint(address _account, uint256 _amount) public whenNotPaused {
+    function mint(address _account, uint256 _amount) public onlyCFO whenNotPaused {
         _mint(_account, _amount);
     }
 

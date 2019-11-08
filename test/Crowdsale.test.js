@@ -17,7 +17,6 @@ contract('FGToken', ([DEPLOYER, CEO, CFO, INVESTOR, OTHERINVESTOR]) => {
 
     beforeEach('test', async () => {
 
-
       token = await FGToken.new('FGToken', 'FGT', 8, maxCap, { from: DEPLOYER });
 
       crowdsale = await FGTokenCrowdsale.new(CFO, token.address, { from: DEPLOYER });
@@ -30,10 +29,14 @@ contract('FGToken', ([DEPLOYER, CEO, CFO, INVESTOR, OTHERINVESTOR]) => {
       await token.mint(crowdsale.address, maxCap, { from: CFO });
     });
 
+    it('should create crowdsale with correct parameters', async function () {
+      expect(await this.crowdsale.wallet()).to.equal(token.address);
+      
+    });
+
     it('should accept payments during the sale', async () => {
       const amount = ether('1');
       const expectedTokenAmount = new BN(amount / (Math.pow(10, 10)));
-     
       await truffleAssertions.passes(crowdsale.buyTokens(INVESTOR, { value: amount, from: INVESTOR }));
       expect(await token.balanceOf(INVESTOR)).to.be.bignumber.equal(expectedTokenAmount);
     });

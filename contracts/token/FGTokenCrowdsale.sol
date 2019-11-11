@@ -3,7 +3,7 @@ pragma solidity ^0.5.1;
 import '@openzeppelin/contracts/math/SafeMath.sol';
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-
+import "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 
 /**
  * @title Reference implementation of the Crowdsale contract.
@@ -85,8 +85,5 @@ contract FGTokenCrowdsale is ReentrancyGuard {
     function rate() public view returns (uint256) {
         return _rate;
     }
-
-
-
 
 }

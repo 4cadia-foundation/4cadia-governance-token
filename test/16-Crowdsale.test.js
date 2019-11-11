@@ -1,17 +1,16 @@
 const FGToken = artifacts.require('FGToken');
 const FGTokenCrowdsale = artifacts.require('FGTokenCrowdsale');
 const truffleAssertions = require('truffle-assertions');
-const { BN, ether, time, expectRevert, balance } = require('@openzeppelin/test-helpers');
-
+const { BN, ether } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
 
 contract('FGToken', ([_, DEPLOYER, CEO, CFO, INVESTOR, OTHERINVESTOR]) => {
 
-
   const maxCap = 100000000000;
+  
+  const rate = 1;
   let token;
   let crowdsale;
-
 
   describe('Crowdsale', () => {
 
@@ -19,7 +18,7 @@ contract('FGToken', ([_, DEPLOYER, CEO, CFO, INVESTOR, OTHERINVESTOR]) => {
 
       token = await FGToken.new('FGToken', 'FGT', 8, maxCap, { from: DEPLOYER });
 
-      crowdsale = await FGTokenCrowdsale.new(CFO, token.address, { from: DEPLOYER });
+      crowdsale = await FGTokenCrowdsale.new(rate, CFO, token.address, { from: DEPLOYER });
 
       await token.addCEO(CEO, { from: DEPLOYER });
       await token.addCFO(CFO, { from: CEO });
@@ -29,11 +28,6 @@ contract('FGToken', ([_, DEPLOYER, CEO, CFO, INVESTOR, OTHERINVESTOR]) => {
       await token.mint(crowdsale.address, maxCap, { from: CFO });
     });
 
-    it('should create crowdsale with correct parameters', async function () {
-      expect(await this.crowdsale.wallet()).to.equal(token.address);
-      
-    });
-
     it('should accept payments during the sale', async () => {
       const amount = ether('1');
       const expectedTokenAmount = new BN(amount / (Math.pow(10, 10)));
@@ -41,14 +35,5 @@ contract('FGToken', ([_, DEPLOYER, CEO, CFO, INVESTOR, OTHERINVESTOR]) => {
       expect(await token.balanceOf(INVESTOR)).to.be.bignumber.equal(expectedTokenAmount);
     });
 
-    it('should return crowdsale: beneficiary is the zero address', async () => {
-      const amount = ether('1');
-      const expectedTokenAmount = new BN(amount / (Math.pow(10, 10)));
-      await truffleAssertions.passes(crowdsale.buyTokens(0, { value: amount, from: 0 }));
-      // expect(await token.balanceOf(INVESTOR)).to.be.bignumber.equal(expectedTokenAmount);
-    });
-
-
   });
-
-})
+});

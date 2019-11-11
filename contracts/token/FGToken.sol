@@ -214,7 +214,7 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
     }
 
     function _readyToForecast() internal view returns (bool) {
-        return (_forecastCooldownDate < now);
+        return (_forecastCooldownDate <= now);
     }
 
     /**

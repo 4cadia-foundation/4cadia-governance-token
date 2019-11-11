@@ -25,9 +25,9 @@ contract('FGToken', accounts => {
     });
     
     it('totalSupply do not change after transfer', async () => {
-      var totalSupplyBefore = await token.totalSupply();
+      const totalSupplyBefore = await token.totalSupply();
       await token.transfer(listAccounts.User, amount, empty, { from: listAccounts.CFO });
-      var totalSupplyAfter = await token.totalSupply();      
+      const totalSupplyAfter = await token.totalSupply();      
       assert.equal(Number(totalSupplyBefore), Number(totalSupplyAfter));
     });
 

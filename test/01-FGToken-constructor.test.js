@@ -1,5 +1,5 @@
 const FGToken = artifacts.require('FGToken');
-const { name, symbol, decimals, maxCap } = require('./helpers');
+const { name, symbol, decimals, maxCap, forecastDuration } = require('./helpers');
 
 contract('FGToken', accounts => {
 
@@ -7,7 +7,7 @@ contract('FGToken', accounts => {
   const addressCreator = accounts[0];
 
   beforeEach('test', async () => {
-    token = await FGToken.new(name, symbol, decimals, maxCap);
+    token = await FGToken.new(name, symbol, decimals, maxCap, forecastDuration);
   });
 
   describe('Constructor', () => {

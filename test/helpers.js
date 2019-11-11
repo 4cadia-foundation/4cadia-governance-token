@@ -29,5 +29,6 @@ const forecastAmount = 200 * 10 ** decimals;
 const amount = 100 * 10 ** decimals;
 const data = new Uint8Array([83, 97, 109, 112, 108, 101, 32, 68, 97, 116, 97]);
 const empty = new  Uint8Array([0]);
+const forecastDuration = 7;
 
-module.exports = { should, expect, parseAccounts, name, symbol, decimals, maxCap, forecastAmount, amount, data, empty };
+module.exports = { should, expect, parseAccounts, name, symbol, decimals, maxCap, forecastAmount, amount, data, empty, forecastDuration };

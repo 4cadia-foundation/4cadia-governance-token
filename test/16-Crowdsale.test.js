@@ -5,7 +5,7 @@ const { BN, ether, time, expectRevert, balance } = require('@openzeppelin/test-h
 
 const { expect } = require('chai');
 
-contract('FGToken', ([DEPLOYER, CEO, CFO, INVESTOR, OTHERINVESTOR]) => {
+contract('FGToken', ([_, DEPLOYER, CEO, CFO, INVESTOR, OTHERINVESTOR]) => {
 
 
   const maxCap = 100000000000;
@@ -40,6 +40,14 @@ contract('FGToken', ([DEPLOYER, CEO, CFO, INVESTOR, OTHERINVESTOR]) => {
       await truffleAssertions.passes(crowdsale.buyTokens(INVESTOR, { value: amount, from: INVESTOR }));
       expect(await token.balanceOf(INVESTOR)).to.be.bignumber.equal(expectedTokenAmount);
     });
+
+    it('should return crowdsale: beneficiary is the zero address', async () => {
+      const amount = ether('1');
+      const expectedTokenAmount = new BN(amount / (Math.pow(10, 10)));
+      await truffleAssertions.passes(crowdsale.buyTokens(0, { value: amount, from: 0 }));
+      // expect(await token.balanceOf(INVESTOR)).to.be.bignumber.equal(expectedTokenAmount);
+    });
+
 
   });
 

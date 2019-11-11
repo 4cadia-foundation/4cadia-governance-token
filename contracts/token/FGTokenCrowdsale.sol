@@ -4,18 +4,22 @@ import '@openzeppelin/contracts/math/SafeMath.sol';
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
+
+/**
+ * @title Reference implementation of the Crowdsale contract.
+ */
 contract FGTokenCrowdsale is ReentrancyGuard {
 
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-    // The token being sold
+
     IERC20 private _token;
 
-     // Amount of wei raised
+    uint256 private _rate;
+
     uint256 private _weiRaised;
 
-    // Address where funds are collected
     address payable private _wallet;
 
     /**
@@ -28,6 +32,7 @@ contract FGTokenCrowdsale is ReentrancyGuard {
     event TokensPurchased(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
     constructor (
+        uint256 rate,
         address payable wallet,
         ERC20Mintable token
     )
@@ -35,7 +40,7 @@ contract FGTokenCrowdsale is ReentrancyGuard {
     {
         _wallet = wallet;
         _token = token;
-
+        _rate = rate;
     }
 
     function () external payable {
@@ -49,7 +54,7 @@ contract FGTokenCrowdsale is ReentrancyGuard {
 
         uint256 weiAmount = msg.value;
 
-        uint256 tokens = (weiAmount.div(10**10)) * 1;
+        uint256 tokens = (weiAmount.div(10**10)) * _rate;
 
         _weiRaised = _weiRaised.add(weiAmount);
 
@@ -66,12 +71,22 @@ contract FGTokenCrowdsale is ReentrancyGuard {
         return _weiRaised;
     }
 
-      /**
+    /**
      * @dev Determines how ETH is stored/forwarded on purchases.
-     */
+    */
     function _forwardFunds() internal {
         _wallet.transfer(msg.value);
     }
 
-    
+
+    /**
+     * @return the number of token units a buyer gets per wei.
+     */
+    function rate() public view returns (uint256) {
+        return _rate;
+    }
+
+
+
+
 }

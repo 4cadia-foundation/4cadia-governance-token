@@ -1,8 +1,7 @@
-pragma solidity ^0.5.1;
+pragma solidity 0.5.1;
 
 import "./IERC223.sol";
 import "./IERC223Recipient.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 import "../access/roles/CeoCfoRole.sol";
 import "../access/roles/MaxCapRole.sol";
@@ -21,19 +20,25 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
     uint256 private _totalSupply;
     uint256 private _maxCap;
     uint256 private _forecast;
+    uint256 private _lastForecastDate;
+    uint256 private _forecastWait;
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Burn(address indexed from, uint256 value);
     event Mint(address indexed to, uint256 value);
     event ForecastChange(uint256 oldValue, uint256 newValue);
+    event ForecastWait(uint256 oldForecastDuration, uint256 newForecastDuration);
     event MaxCapChange (uint256 oldValue, uint256 newValue);
 
+
     constructor (
-        string memory _name, string memory _symbol, uint8 _decimals, uint256 _maxCapValue)
+        string memory _name, string memory _symbol, uint8 _decimals, uint256 _maxCapValue, uint256 _forecastDuration)
         ERC20Detailed(_name, _symbol, _decimals) public {
         increaseMaxCap(_maxCapValue);
         _forecast = 0;
         _totalSupply = 0;
+        changeForecastWait(_forecastDuration);
+        _lastForecastDate = now;
     }
 
 
@@ -184,14 +189,48 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
         return true;
     }
 
+
+    /**
+    * @dev change forecast wait in days
+    */
+    function changeForecastWait(uint256 _duration) public onlyCEO {
+        uint256 oldForecastDuration = _forecastWait;
+        _forecastWait = _duration * 1 days;
+        emit ForecastWait(oldForecastDuration, _duration);
+    }
+
+    /**
+    * @dev update date of forecast with forecast duration
+    */
+    function _updateLastForecastDate() internal {
+        _lastForecastDate = now.add(_forecastWait);
+    }
+
+    /**
+    * @dev return last forecast date
+    */
+    function lastForecastDate() public view returns (uint256) {
+        return _lastForecastDate;
+    }
+
+    /**
+    * @dev return wait time to next forecast
+    */
+    function forecastWait() public view returns (uint256) {
+        return _forecastWait;
+    }
+
     /**
     * @dev increment forecast value
     * @param _value The amount to be increment.
     */
     function increaseForecast(uint256 _value) public whenNotPaused onlyCFO returns (bool) {
-        require((forecast() + _value + _totalSupply) <= maxCap(), 'FGToken: forecast greater than maxCap');
+        require((forecast() + _value + totalSupply()) <= maxCap(), 'FGToken: forecast greater than maxCap');
+        require(_lastForecastDate <= now, "FGToken: forecast before wait time");
+
         uint256 oldValue = _forecast;
         _forecast = _forecast.add(_value);
+        _updateLastForecastDate();
         emit ForecastChange(oldValue, _forecast);
         return true;
     }

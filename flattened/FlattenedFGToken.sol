@@ -1,5 +1,5 @@
 
-// File: contracts\token\IERC223.sol
+// File: contracts/token/IERC223.sol
 
 pragma solidity ^0.5.1;
 
@@ -42,7 +42,7 @@ contract IERC223 {
     event Transfer(address indexed from, address indexed to, uint256 value, bytes data);
 }
 
-// File: contracts\token\IERC223Recipient.sol
+// File: contracts/token/IERC223Recipient.sol
 
 pragma solidity ^0.5.1;
 
@@ -61,7 +61,7 @@ contract IERC223Recipient {
     function tokenFallback(address _from, uint _value, bytes memory _data) public;
 }
 
-// File: @openzeppelin\contracts\token\ERC20\IERC20.sol
+// File: @openzeppelin/contracts/token/ERC20/IERC20.sol
 
 pragma solidity ^0.5.0;
 
@@ -140,86 +140,7 @@ interface IERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-// File: node_modules\@openzeppelin\contracts\token\ERC20\IERC20.sol
-
-pragma solidity ^0.5.0;
-
-/**
- * @dev Interface of the ERC20 standard as defined in the EIP. Does not include
- * the optional functions; to access them see `ERC20Detailed`.
- */
-interface IERC20 {
-    /**
-     * @dev Returns the amount of tokens in existence.
-     */
-    function totalSupply() external view returns (uint256);
-
-    /**
-     * @dev Returns the amount of tokens owned by `account`.
-     */
-    function balanceOf(address account) external view returns (uint256);
-
-    /**
-     * @dev Moves `amount` tokens from the caller's account to `recipient`.
-     *
-     * Returns a boolean value indicating whether the operation succeeded.
-     *
-     * Emits a `Transfer` event.
-     */
-    function transfer(address recipient, uint256 amount) external returns (bool);
-
-    /**
-     * @dev Returns the remaining number of tokens that `spender` will be
-     * allowed to spend on behalf of `owner` through `transferFrom`. This is
-     * zero by default.
-     *
-     * This value changes when `approve` or `transferFrom` are called.
-     */
-    function allowance(address owner, address spender) external view returns (uint256);
-
-    /**
-     * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
-     *
-     * Returns a boolean value indicating whether the operation succeeded.
-     *
-     * > Beware that changing an allowance with this method brings the risk
-     * that someone may use both the old and the new allowance by unfortunate
-     * transaction ordering. One possible solution to mitigate this race
-     * condition is to first reduce the spender's allowance to 0 and set the
-     * desired value afterwards:
-     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-     *
-     * Emits an `Approval` event.
-     */
-    function approve(address spender, uint256 amount) external returns (bool);
-
-    /**
-     * @dev Moves `amount` tokens from `sender` to `recipient` using the
-     * allowance mechanism. `amount` is then deducted from the caller's
-     * allowance.
-     *
-     * Returns a boolean value indicating whether the operation succeeded.
-     *
-     * Emits a `Transfer` event.
-     */
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
-
-    /**
-     * @dev Emitted when `value` tokens are moved from one account (`from`) to
-     * another (`to`).
-     *
-     * Note that `value` may be zero.
-     */
-    event Transfer(address indexed from, address indexed to, uint256 value);
-
-    /**
-     * @dev Emitted when the allowance of a `spender` for an `owner` is set by
-     * a call to `approve`. `value` is the new allowance.
-     */
-    event Approval(address indexed owner, address indexed spender, uint256 value);
-}
-
-// File: @openzeppelin\contracts\token\ERC20\ERC20Detailed.sol
+// File: @openzeppelin/contracts/token/ERC20/ERC20Detailed.sol
 
 pragma solidity ^0.5.0;
 
@@ -275,7 +196,7 @@ contract ERC20Detailed is IERC20 {
     }
 }
 
-// File: @openzeppelin\contracts\access\Roles.sol
+// File: @openzeppelin/contracts/access/Roles.sol
 
 pragma solidity ^0.5.0;
 
@@ -314,7 +235,7 @@ library Roles {
     }
 }
 
-// File: @openzeppelin\contracts\math\SafeMath.sol
+// File: @openzeppelin/contracts/math/SafeMath.sol
 
 pragma solidity ^0.5.0;
 
@@ -424,7 +345,7 @@ library SafeMath {
     }
 }
 
-// File: contracts\access\roles\CeoCfoRole.sol
+// File: contracts/access/roles/CeoCfoRole.sol
 
 pragma solidity ^0.5.1;
 
@@ -525,7 +446,7 @@ contract CeoCfoRole {
 
 }
 
-// File: contracts\access\roles\MaxCapRole.sol
+// File: contracts/access/roles/MaxCapRole.sol
 
 pragma solidity ^0.5.1;
 
@@ -578,9 +499,10 @@ contract MaxCapRole is CeoCfoRole {
     }
 }
 
-// File: contracts\access\roles\ComplianceRole.sol
+// File: contracts/access/roles/ComplianceRole.sol
 
 pragma solidity ^0.5.1;
+
 
 
 
@@ -588,7 +510,7 @@ pragma solidity ^0.5.1;
  * @title ComplianceRole
  * @dev Compliance are responsible for assigning and removing accounts from whitelist.
  */
-contract ComplianceRole {
+contract ComplianceRole is  CeoCfoRole {
     using Roles for Roles.Role;
     using SafeMath for uint256;
 
@@ -599,7 +521,6 @@ contract ComplianceRole {
     event ComplianceRemoved(address indexed account);
 
     constructor () internal {
-        _addCompliance(msg.sender);
     }
 
     modifier onlyCompliance() {
@@ -615,11 +536,11 @@ contract ComplianceRole {
         return _totalComplianceMembers;
     }
 
-    function addCompliance(address account) public onlyCompliance {
+    function addCompliance(address account) public onlyCEO {
         _addCompliance(account);
     }
 
-    function removeCompliance(address account) public onlyCompliance {
+    function removeCompliance(address account) public onlyCEO {
         _removeCompliance(account);
     }
 
@@ -641,7 +562,7 @@ contract ComplianceRole {
     }
 }
 
-// File: contracts\access\roles\WhitelistedRole.sol
+// File: contracts/access/roles/WhitelistedRole.sol
 
 pragma solidity ^0.5.1;
 
@@ -693,7 +614,7 @@ contract WhitelistedRole is ComplianceRole {
 
 }
 
-// File: contracts\token\Pausable.sol
+// File: contracts/token/Pausable.sol
 
 pragma solidity ^0.5.1;
 
@@ -769,7 +690,7 @@ contract Pausable is CeoCfoRole {
     }
 }
 
-// File: contracts\utils\Address.sol
+// File: contracts/utils/Address.sol
 
 pragma solidity ^0.5.0;
 
@@ -810,10 +731,9 @@ library Address {
     }
 }
 
-// File: contracts\token\FGToken.sol
+// File: contracts/token/FGToken.sol
 
-pragma solidity ^0.5.1;
-
+pragma solidity 0.5.1;
 
 
 
@@ -834,19 +754,25 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
     uint256 private _totalSupply;
     uint256 private _maxCap;
     uint256 private _forecast;
+    uint256 private _lastForecastDate;
+    uint256 private _forecastWait;
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Burn(address indexed from, uint256 value);
     event Mint(address indexed to, uint256 value);
     event ForecastChange(uint256 oldValue, uint256 newValue);
+    event ForecastWait(uint256 oldForecastDuration, uint256 newForecastDuration);
     event MaxCapChange (uint256 oldValue, uint256 newValue);
 
+
     constructor (
-        string memory _name, string memory _symbol, uint8 _decimals, uint256 _maxCapValue)
+        string memory _name, string memory _symbol, uint8 _decimals, uint256 _maxCapValue, uint256 _forecastDuration)
         ERC20Detailed(_name, _symbol, _decimals) public {
         increaseMaxCap(_maxCapValue);
         _forecast = 0;
         _totalSupply = 0;
+        changeForecastWait(_forecastDuration);
+        _lastForecastDate = now;
     }
 
 
@@ -997,14 +923,48 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
         return true;
     }
 
+
+    /**
+    * @dev change forecast wait in days
+    */
+    function changeForecastWait(uint256 _duration) public onlyCEO {
+        uint256 oldForecastDuration = _forecastWait;
+        _forecastWait = _duration * 1 days;
+        emit ForecastWait(oldForecastDuration, _duration);
+    }
+
+    /**
+    * @dev update date of forecast with forecast duration
+    */
+    function _updateLastForecastDate() internal {
+        _lastForecastDate = now.add(_forecastWait);
+    }
+
+    /**
+    * @dev return last forecast date
+    */
+    function lastForecastDate() public view returns (uint256) {
+        return _lastForecastDate;
+    }
+
+    /**
+    * @dev return wait time to next forecast
+    */
+    function forecastWait() public view returns (uint256) {
+        return _forecastWait;
+    }
+
     /**
     * @dev increment forecast value
     * @param _value The amount to be increment.
     */
     function increaseForecast(uint256 _value) public whenNotPaused onlyCFO returns (bool) {
-        require((forecast() + _value + _totalSupply) <= maxCap(), 'FGToken: forecast greater than maxCap');
+        require((forecast() + _value + totalSupply()) <= maxCap(), 'FGToken: forecast greater than maxCap');
+        require(_lastForecastDate <= now, "FGToken: forecast before wait time");
+
         uint256 oldValue = _forecast;
         _forecast = _forecast.add(_value);
+        _updateLastForecastDate();
         emit ForecastChange(oldValue, _forecast);
         return true;
     }

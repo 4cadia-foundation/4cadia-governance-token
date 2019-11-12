@@ -1,8 +1,7 @@
-pragma solidity ^0.5.1;
+pragma solidity 0.5.1;
 
 import "./IERC223.sol";
 import "./IERC223Recipient.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 import "../access/roles/CeoCfoRole.sol";
 import "../access/roles/MaxCapRole.sol";
@@ -21,17 +20,16 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
     uint256 private _totalSupply;
     uint256 private _maxCap;
     uint256 private _forecast;
-
-    uint256 private _forecastCooldownDate;
-    uint256 private _forecastCooldownDuration;
+    uint256 private _lastForecastDate;
+    uint256 private _forecastWait;
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Burn(address indexed from, uint256 value);
     event Mint(address indexed to, uint256 value);
     event ForecastChange(uint256 oldValue, uint256 newValue);
-    event ForecastDuration(uint256 oldForecastDuration, uint256 newForecastDuration);
-
+    event ForecastWait(uint256 oldForecastDuration, uint256 newForecastDuration);
     event MaxCapChange (uint256 oldValue, uint256 newValue);
+
 
     constructor (
         string memory _name, string memory _symbol, uint8 _decimals, uint256 _maxCapValue, uint256 _forecastDuration)
@@ -39,10 +37,9 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
         increaseMaxCap(_maxCapValue);
         _forecast = 0;
         _totalSupply = 0;
-        _forecastCooldownDuration = _forecastDuration;
-        _forecastCooldownDate = now;
+        changeForecastWait(_forecastDuration);
+        _lastForecastDate = now;
     }
-
 
 
     function totalSupply() public view returns (uint256) {
@@ -193,49 +190,34 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
     }
 
 
-    function readyToForecast() public view returns (bool) {
-        return _readyToForecast();
-    }
-
     /**
-    * @dev change forecast duration in days
+    * @dev change forecast wait in days
     */
-    function changeForecastCooldownDuration(uint256 _duration) public onlyCEO {
-        _changeForecastCooldownDuration(_duration);
-    }
-
-    /**
-    * @dev change forecast duration in days
-    */
-    function _changeForecastCooldownDuration(uint256 _duration) internal {
-        uint256 oldForecastDuration = _forecastCooldownDuration;
-        _forecastCooldownDuration = _duration;
-        emit ForecastDuration(oldForecastDuration, _duration);
-    }
-
-    function _readyToForecast() internal view returns (bool) {
-        return (_forecastCooldownDate <= now);
+    function changeForecastWait(uint256 _duration) public onlyCEO {
+        uint256 oldForecastDuration = _forecastWait;
+        _forecastWait = _duration * 1 days;
+        emit ForecastWait(oldForecastDuration, _duration);
     }
 
     /**
     * @dev update date of forecast with forecast duration
     */
-    function _updateForecastCooldownDate() internal {
-        _forecastCooldownDate = now.add(_forecastCooldownDuration);
+    function _updateLastForecastDate() internal {
+        _lastForecastDate = now.add(_forecastWait);
     }
 
     /**
-    * @dev return date of forecast
+    * @dev return last forecast date
     */
-    function forecastCooldownDate() public view returns (uint256) {
-        return _forecastCooldownDate;
+    function lastForecastDate() public view returns (uint256) {
+        return _lastForecastDate;
     }
 
     /**
-    * @dev return forecast duration
+    * @dev return wait time to next forecast
     */
-    function forecastCooldownDuration() public view returns (uint256) {
-        return _forecastCooldownDuration;
+    function forecastWait() public view returns (uint256) {
+        return _forecastWait;
     }
 
     /**
@@ -243,12 +225,12 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
     * @param _value The amount to be increment.
     */
     function increaseForecast(uint256 _value) public whenNotPaused onlyCFO returns (bool) {
-        require((forecast() + _value + _totalSupply) <= maxCap(), 'FGToken: forecast greater than maxCap');
-        require(_readyToForecast(), 'FGToken: wait the cooldown period to forecast');
+        require((forecast() + _value + totalSupply()) <= maxCap(), 'FGToken: forecast greater than maxCap');
+        require(_lastForecastDate <= now, "FGToken: forecast before wait time");
 
         uint256 oldValue = _forecast;
         _forecast = _forecast.add(_value);
-        _updateForecastCooldownDate();
+        _updateLastForecastDate();
         emit ForecastChange(oldValue, _forecast);
         return true;
     }

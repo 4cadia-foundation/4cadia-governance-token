@@ -2,12 +2,13 @@ pragma solidity ^0.5.1;
 
 import "@openzeppelin/contracts/access/Roles.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
+import "./CeoCfoRole.sol";
 
 /**
  * @title ComplianceRole
  * @dev Compliance are responsible for assigning and removing accounts from whitelist.
  */
-contract ComplianceRole {
+contract ComplianceRole is  CeoCfoRole {
     using Roles for Roles.Role;
     using SafeMath for uint256;
 
@@ -18,7 +19,6 @@ contract ComplianceRole {
     event ComplianceRemoved(address indexed account);
 
     constructor () internal {
-        _addCompliance(msg.sender);
     }
 
     modifier onlyCompliance() {
@@ -34,11 +34,11 @@ contract ComplianceRole {
         return _totalComplianceMembers;
     }
 
-    function addCompliance(address account) public onlyCompliance {
+    function addCompliance(address account) public onlyCEO {
         _addCompliance(account);
     }
 
-    function removeCompliance(address account) public onlyCompliance {
+    function removeCompliance(address account) public onlyCEO {
         _removeCompliance(account);
     }
 

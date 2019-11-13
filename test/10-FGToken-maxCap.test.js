@@ -2,9 +2,7 @@ const helpers = require('./helpers');
 const FGToken = artifacts.require('FGToken');
 const truffleAssertions = require('truffle-assertions');
 
-const {
-  name, symbol, decimals, maxCap, amount
-} = require('./helpers'); 
+const { name, symbol, decimals, maxCap, amount, forecastDuration } = require('./helpers'); 
 
 
 contract('FGToken', accounts => {
@@ -13,7 +11,7 @@ contract('FGToken', accounts => {
   let listAccounts = helpers.parseAccounts(accounts);
 
   beforeEach(async () => {
-    token = await FGToken.new(name, symbol, decimals, maxCap, { from: listAccounts.CEO });
+    token = await FGToken.new(name, symbol, decimals, maxCap, forecastDuration, { from: listAccounts.CEO });
     await token.addMaxCapManager(listAccounts.MaxCapManager, { from: listAccounts.CEO });
   });
 

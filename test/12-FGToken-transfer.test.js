@@ -3,9 +3,7 @@ const FGToken = artifacts.require('FGToken');
 const BalanceContract = artifacts.require('BalanceContract');
 const truffleAssertions = require('truffle-assertions');
 
-const {
-  name, symbol, decimals, maxCap, forecastAmount, amount, data, empty
-} = require('./helpers');  
+const { name, symbol, decimals, maxCap, forecastAmount, amount, data, empty, forecastDuration } = require('./helpers');  
 
 
 contract('FGToken', accounts => {
@@ -14,7 +12,7 @@ contract('FGToken', accounts => {
   let listAccounts = helpers.parseAccounts(accounts);
 
   beforeEach('test', async () => {
-    token = await FGToken.new(name, symbol, decimals, maxCap, { from: listAccounts.CEO });
+    token = await FGToken.new(name, symbol, decimals, maxCap, forecastDuration, { from: listAccounts.CEO });
     await token.addCFO(listAccounts.CFO, { from: listAccounts.CEO });
     await token.increaseForecast(forecastAmount, { from: listAccounts.CFO });
     await token.mint(listAccounts.CFO, amount, { from: listAccounts.CFO });
@@ -27,9 +25,9 @@ contract('FGToken', accounts => {
     });
     
     it('totalSupply do not change after transfer', async () => {
-      var totalSupplyBefore = await token.totalSupply();
+      const totalSupplyBefore = await token.totalSupply();
       await token.transfer(listAccounts.User, amount, empty, { from: listAccounts.CFO });
-      var totalSupplyAfter = await token.totalSupply();      
+      const totalSupplyAfter = await token.totalSupply();      
       assert.equal(Number(totalSupplyBefore), Number(totalSupplyAfter));
     });
 

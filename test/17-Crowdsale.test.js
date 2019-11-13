@@ -9,14 +9,15 @@ contract('FGToken', ([_, DEPLOYER, CEO, CFO, INVESTOR, OTHERINVESTOR]) => {
   const maxCap = 100000000000;
   
   const rate = 1;
+  const forecastDuration = 7;
   let token;
   let crowdsale;
-
+  
   describe('Crowdsale', () => {
 
     beforeEach('test', async () => {
 
-      token = await FGToken.new('FGToken', 'FGT', 8, maxCap, { from: DEPLOYER });
+      token = await FGToken.new('FGToken', 'FGT', 8, maxCap, forecastDuration, { from: DEPLOYER });
 
       crowdsale = await FGTokenCrowdsale.new(rate, CFO, token.address, { from: DEPLOYER });
 

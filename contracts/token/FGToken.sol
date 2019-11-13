@@ -41,7 +41,7 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
         _lastForecastDate = now;
     }
 
-
+   
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
@@ -245,5 +245,5 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
         emit ForecastChange(oldValue, _forecast);
         return true;
     }
-    
+
 }

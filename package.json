@@ -8,6 +8,7 @@
     "compile": "truffle compile",
     "migrate": "truffle migrate",
     "remix:deploy": "truffle-flattener contracts/token/FGToken.sol > flattened/FlattenedFGToken.sol",
+    "remix:crowdsale": "truffle-flattener contracts/token/FGTokenCrowdsale.sol > flattened/FlattenedCrowdsale.sol",
     "lint": "npm run lint:js && npm run lint:sol",
     "lint:fix": "npm run lint:js:fix",
     "lint:js": "eslint .",
@@ -40,9 +41,13 @@
     "eslint-plugin-promise": "^3.8.0",
     "eslint-plugin-standard": "^3.1.0",
     "eth-gas-reporter": "^0.2.12",
+    "ethers": "^4.0.39",
     "solhint": "2.1.0",
     "truffle": "^5.0.41",
     "truffle-assertions": "^0.9.1",
     "truffle-flattener": "^1.4.2"
+  },
+  "devDependencies": {
+    "@openzeppelin/test-helpers": "^0.5.3"
   }
 }

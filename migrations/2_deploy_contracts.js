@@ -5,5 +5,6 @@ module.exports = function (deployer, network, accounts) {
   const symbol = 'FGT';
   const decimals = 8;
   const maxCap = 1000 * 10 ** decimals;
-  deployer.deploy(FGToken, name, symbol, decimals, maxCap);
+  const forecastDuration = 7;
+  deployer.deploy(FGToken, name, symbol, decimals, maxCap, forecastDuration);
 };

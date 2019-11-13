@@ -1,14 +1,12 @@
 const FGToken = artifacts.require('FGToken');
 
-const {
-  name, symbol, decimals, maxCap
-} = require('./helpers'); 
+const { name, symbol, decimals, maxCap, forecastDuration } = require('./helpers');
 
 
 contract('FGToken', () => {
 
   beforeEach(async () => {
-    this.token = await FGToken.new(name, symbol, decimals, maxCap);
+    this.token = await FGToken.new(name, symbol, decimals, maxCap, forecastDuration);
   });
 
   describe('Token Attributes', () => {

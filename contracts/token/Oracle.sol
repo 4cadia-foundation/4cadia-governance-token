@@ -1,6 +1,6 @@
 pragma solidity ^0.5.1;
 
-import "github.com/provable-things/ethereum-api/provableAPI.sol";
+import "../vendors/oraclize-api/contracts/oraclize.sol";
 
 contract Oracle is usingProvable {
     
@@ -12,10 +12,10 @@ contract Oracle is usingProvable {
     constructor()
         public
     {
-        update();
+        getETHValue();
     }
 
-    function update() 
+    function getETHValue() 
         public
         payable
     {

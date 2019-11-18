@@ -17,6 +17,8 @@ contract FGTokenCrowdsale is ReentrancyGuard {
     IERC20 private _token;
 
     uint256 private _rate;
+    uint256 private _sellingRate;
+
 
     uint256 private _weiRaised;
 
@@ -53,16 +55,25 @@ contract FGTokenCrowdsale is ReentrancyGuard {
         require(msg.value != 0, "Crowdsale: weiAmount is 0");
 
         uint256 weiAmount = msg.value;
+        uint256 sellingRate = 184.0;
 
-        uint256 tokens = (weiAmount.div(10**10)) * _rate;
+        uint256 amountWithRate = weiAmount * sellingRate;
+        uint256 tokenConversion = amountWithRate.div(10**10);
+        uint256 tokens = tokenConversion * _rate;
+
+        if (tokens < 1)
+            revert("Operation balance cannot be less than one token");
 
         _weiRaised = _weiRaised.add(weiAmount);
 
         _token.safeTransfer(beneficiary, tokens);
 
         emit TokensPurchased(msg.sender, beneficiary, weiAmount, tokens);
-        _forwardFunds();
+
+        _wallet.transfer(msg.value);
     }
+
+
 
     /**
      * @return the amount of wei raised.
@@ -70,14 +81,6 @@ contract FGTokenCrowdsale is ReentrancyGuard {
     function weiRaised() public view returns (uint256) {
         return _weiRaised;
     }
-
-    /**
-     * @dev Determines how ETH is stored/forwarded on purchases.
-    */
-    function _forwardFunds() internal {
-        _wallet.transfer(msg.value);
-    }
-
 
     /**
      * @return the number of token units a buyer gets per wei.

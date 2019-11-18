@@ -1,6 +1,6 @@
 pragma solidity ^0.5.1;
 
-import "../vendors/oraclize-api/contracts/oraclize.sol";
+import "../../vendors/oraclize-api/contracts/oraclize.sol";
 
 contract Oracle is usingProvable {
     

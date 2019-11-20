@@ -1,7 +1,7 @@
 
-// File: contracts/token/IERC223.sol
+// File: contracts\token\IERC223.sol
 
-pragma solidity ^0.5.1;
+pragma solidity 0.5.11;
 
 /**
  * @dev Interface of the ERC777Token standard as defined in the EIP.
@@ -42,9 +42,9 @@ contract IERC223 {
     event Transfer(address indexed from, address indexed to, uint256 value, bytes data);
 }
 
-// File: contracts/token/IERC223Recipient.sol
+// File: contracts\token\IERC223Recipient.sol
 
-pragma solidity ^0.5.1;
+pragma solidity 0.5.11;
 
  /**
  * @title Contract that will work with ERC223 tokens.
@@ -61,7 +61,7 @@ contract IERC223Recipient {
     function tokenFallback(address _from, uint _value, bytes memory _data) public;
 }
 
-// File: @openzeppelin/contracts/token/ERC20/IERC20.sol
+// File: node_modules\@openzeppelin\contracts\token\ERC20\IERC20.sol
 
 pragma solidity ^0.5.0;
 
@@ -140,7 +140,7 @@ interface IERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-// File: @openzeppelin/contracts/token/ERC20/ERC20Detailed.sol
+// File: @openzeppelin\contracts\token\ERC20\ERC20Detailed.sol
 
 pragma solidity ^0.5.0;
 
@@ -196,7 +196,7 @@ contract ERC20Detailed is IERC20 {
     }
 }
 
-// File: @openzeppelin/contracts/access/Roles.sol
+// File: @openzeppelin\contracts\access\Roles.sol
 
 pragma solidity ^0.5.0;
 
@@ -235,7 +235,7 @@ library Roles {
     }
 }
 
-// File: @openzeppelin/contracts/math/SafeMath.sol
+// File: @openzeppelin\contracts\math\SafeMath.sol
 
 pragma solidity ^0.5.0;
 
@@ -345,11 +345,9 @@ library SafeMath {
     }
 }
 
-// File: contracts/access/roles/CeoCfoRole.sol
+// File: contracts\access\roles\CeoCfoRole.sol
 
-pragma solidity ^0.5.1;
-
-
+pragma solidity 0.5.11;
 
 /**
  * @title Chief executive officer and Chief financial officer
@@ -443,13 +441,11 @@ contract CeoCfoRole {
         _CFOs.remove(account);
         emit CFORemoved(account);
     }
-
 }
 
-// File: contracts/access/roles/MaxCapRole.sol
+// File: contracts\access\roles\MaxCapRole.sol
 
-pragma solidity ^0.5.1;
-
+pragma solidity 0.5.11;
 
 /**
  * @title Manager maxcap feature
@@ -499,17 +495,15 @@ contract MaxCapRole is CeoCfoRole {
     }
 }
 
-// File: contracts/access/roles/ComplianceRole.sol
+// File: contracts\access\roles\ComplianceRole.sol
 
-pragma solidity ^0.5.1;
-
-
+pragma solidity 0.5.11;
 
 /**
  * @title ComplianceRole
  * @dev Compliance are responsible for assigning and removing accounts from whitelist.
  */
-contract ComplianceRole {
+contract ComplianceRole is  CeoCfoRole {
     using Roles for Roles.Role;
     using SafeMath for uint256;
 
@@ -518,10 +512,6 @@ contract ComplianceRole {
 
     event ComplianceAdded(address indexed account);
     event ComplianceRemoved(address indexed account);
-
-    constructor () internal {
-        _addCompliance(msg.sender);
-    }
 
     modifier onlyCompliance() {
         require(isCompliance(msg.sender), "ComplianceRole: onlyCompliance");
@@ -536,11 +526,11 @@ contract ComplianceRole {
         return _totalComplianceMembers;
     }
 
-    function addCompliance(address account) public onlyCompliance {
+    function addCompliance(address account) public onlyCEO {
         _addCompliance(account);
     }
 
-    function removeCompliance(address account) public onlyCompliance {
+    function removeCompliance(address account) public onlyCEO {
         _removeCompliance(account);
     }
 
@@ -562,10 +552,9 @@ contract ComplianceRole {
     }
 }
 
-// File: contracts/access/roles/WhitelistedRole.sol
+// File: contracts\access\roles\WhitelistedRole.sol
 
-pragma solidity ^0.5.1;
-
+pragma solidity 0.5.11;
 
 /**
  * @title WhitelistedRole
@@ -581,10 +570,11 @@ contract WhitelistedRole is ComplianceRole {
     event WhitelistedAdded(address indexed account);
     event WhitelistedRemoved(address indexed account);
 
-    modifier onlyWhitelisted() {
-        require(isWhitelisted(msg.sender), "WhitelistedRole: onlyWhitelisted");
-        _;
-    }
+    // unused code
+    // modifier onlyWhitelisted() {
+    //     require(isWhitelisted(msg.sender), "WhitelistedRole: onlyWhitelisted");
+    //     _;
+    // }
 
     function isWhitelisted(address account) public view returns (bool) {
         return _whitelisteds.has(account);
@@ -611,13 +601,11 @@ contract WhitelistedRole is ComplianceRole {
         _whitelisteds.remove(account);
         emit WhitelistedRemoved(account);
     }
-
 }
 
-// File: contracts/token/Pausable.sol
+// File: contracts\token\Pausable.sol
 
-pragma solidity ^0.5.1;
-
+pragma solidity 0.5.11;
 
 /**
  * @dev Contract module which allows children to implement an emergency stop
@@ -690,9 +678,9 @@ contract Pausable is CeoCfoRole {
     }
 }
 
-// File: contracts/utils/Address.sol
+// File: contracts\utils\Address.sol
 
-pragma solidity ^0.5.0;
+pragma solidity 0.5.11;
 
 /**
  * @dev Collection of functions related to the address type
@@ -731,18 +719,9 @@ library Address {
     }
 }
 
-// File: contracts/token/FGToken.sol
+// File: contracts\token\FGToken.sol
 
-pragma solidity ^0.5.1;
-
-
-
-
-
-
-
-
-
+pragma solidity 0.5.11;
 
 /**
  * @title Reference implementation of the ERC223 standard token.
@@ -750,26 +729,30 @@ pragma solidity ^0.5.1;
 contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, ComplianceRole, WhitelistedRole {
     using SafeMath for uint256;
 
-    mapping(address => uint256) _balances;
+    mapping(address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowances;
     uint256 private _totalSupply;
     uint256 private _maxCap;
     uint256 private _forecast;
+    uint256 private _lastForecastDate;
+    uint256 private _forecastWait;
 
     event Approval(address indexed owner, address indexed spender, uint256 value);
     event Burn(address indexed from, uint256 value);
     event Mint(address indexed to, uint256 value);
     event ForecastChange(uint256 oldValue, uint256 newValue);
+    event ForecastWait(uint256 oldForecastDuration, uint256 newForecastDuration);
     event MaxCapChange (uint256 oldValue, uint256 newValue);
 
     constructor (
-        string memory _name, string memory _symbol, uint8 _decimals, uint256 _maxCapValue)
+        string memory _name, string memory _symbol, uint8 _decimals, uint256 _maxCapValue, uint256 _forecastDuration)
         ERC20Detailed(_name, _symbol, _decimals) public {
         increaseMaxCap(_maxCapValue);
         _forecast = 0;
         _totalSupply = 0;
+        changeForecastWait(_forecastDuration);
+        _lastForecastDate = now;
     }
-
 
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
@@ -861,8 +844,6 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
         return true;
     }
 
-
-
     /**
      * @dev See {ERC20-_mint}.
      *
@@ -870,7 +851,7 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
      *
      * - the caller must have the {CFORole}.
      */
-    function mint(address _account, uint256 _amount) public whenNotPaused {
+    function mint(address _account, uint256 _amount) public onlyCFO whenNotPaused {
         _mint(_account, _amount);
     }
 
@@ -919,13 +900,46 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
     }
 
     /**
+    * @dev change forecast wait in days
+    */
+    function changeForecastWait(uint256 _duration) public onlyCEO {
+        uint256 oldForecastDuration = _forecastWait;
+        _forecastWait = _duration.mul(1 days);
+        emit ForecastWait(oldForecastDuration, _duration);
+    }
+
+    /**
+    * @dev update date of forecast with forecast duration
+    */
+    function _updateLastForecastDate() internal {
+        _lastForecastDate = now.add(_forecastWait);
+    }
+
+    /**
+    * @dev return last forecast date
+    */
+    function lastForecastDate() public view returns (uint256) {
+        return _lastForecastDate;
+    }
+
+    /**
+    * @dev return wait time to next forecast
+    */
+    function forecastWait() public view returns (uint256) {
+        return _forecastWait;
+    }
+
+    /**
     * @dev increment forecast value
     * @param _value The amount to be increment.
     */
     function increaseForecast(uint256 _value) public whenNotPaused onlyCFO returns (bool) {
-        require((forecast() + _value + _totalSupply) <= maxCap(), 'FGToken: forecast greater than maxCap');
+        require((forecast() + _value + totalSupply()) <= maxCap(), 'FGToken: forecast greater than maxCap');
+        require(_lastForecastDate <= now, "FGToken: forecast before wait time");
+
         uint256 oldValue = _forecast;
         _forecast = _forecast.add(_value);
+        _updateLastForecastDate();
         emit ForecastChange(oldValue, _forecast);
         return true;
     }

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.1;
+pragma solidity 0.5.11;
 
 import "@openzeppelin/contracts/access/Roles.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
@@ -95,5 +95,4 @@ contract CeoCfoRole {
         _CFOs.remove(account);
         emit CFORemoved(account);
     }
-
 }

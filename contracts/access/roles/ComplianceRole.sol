@@ -1,4 +1,4 @@
-pragma solidity ^0.5.1;
+pragma solidity 0.5.11;
 
 import "@openzeppelin/contracts/access/Roles.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
@@ -17,9 +17,6 @@ contract ComplianceRole is  CeoCfoRole {
 
     event ComplianceAdded(address indexed account);
     event ComplianceRemoved(address indexed account);
-
-    constructor () internal {
-    }
 
     modifier onlyCompliance() {
         require(isCompliance(msg.sender), "ComplianceRole: onlyCompliance");

@@ -1,4 +1,4 @@
-pragma solidity 0.5.1;
+pragma solidity 0.5.11;
 
 import "./IERC223.sol";
 import "./IERC223Recipient.sol";
@@ -15,7 +15,7 @@ import "../utils/Address.sol";
 contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, ComplianceRole, WhitelistedRole {
     using SafeMath for uint256;
 
-    mapping(address => uint256) _balances;
+    mapping(address => uint256) private _balances;
     mapping (address => mapping (address => uint256)) private _allowances;
     uint256 private _totalSupply;
     uint256 private _maxCap;
@@ -30,7 +30,6 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
     event ForecastWait(uint256 oldForecastDuration, uint256 newForecastDuration);
     event MaxCapChange (uint256 oldValue, uint256 newValue);
 
-
     constructor (
         string memory _name, string memory _symbol, uint8 _decimals, uint256 _maxCapValue, uint256 _forecastDuration)
         ERC20Detailed(_name, _symbol, _decimals) public {
@@ -41,7 +40,6 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
         _lastForecastDate = now;
     }
 
-   
     function totalSupply() public view returns (uint256) {
         return _totalSupply;
     }
@@ -132,8 +130,6 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
         return true;
     }
 
-
-
     /**
      * @dev See {ERC20-_mint}.
      *
@@ -189,13 +185,12 @@ contract FGToken is IERC223, ERC20Detailed, CeoCfoRole, Pausable, MaxCapRole, Co
         return true;
     }
 
-
     /**
     * @dev change forecast wait in days
     */
     function changeForecastWait(uint256 _duration) public onlyCEO {
         uint256 oldForecastDuration = _forecastWait;
-        _forecastWait = _duration * 1 days;
+        _forecastWait = _duration.mul(1 days);
         emit ForecastWait(oldForecastDuration, _duration);
     }
 

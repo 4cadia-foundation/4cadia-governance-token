@@ -1,4 +1,4 @@
-pragma solidity ^0.5.1;
+pragma solidity 0.5.11;
 
 import '@openzeppelin/contracts/math/SafeMath.sol';
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
@@ -13,12 +13,10 @@ contract FGTokenCrowdsale is ReentrancyGuard {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
-
     IERC20 private _token;
 
     uint256 private _rate;
     uint256 private _sellingRate;
-
 
     uint256 private _weiRaised;
 
@@ -49,7 +47,6 @@ contract FGTokenCrowdsale is ReentrancyGuard {
         buyTokens(msg.sender);
     }
 
-
     function buyTokens(address beneficiary) public nonReentrant payable {
         require(beneficiary != address(0), "Crowdsale: beneficiary is the zero address");
         require(msg.value != 0, "Crowdsale: weiAmount is 0");
@@ -73,8 +70,6 @@ contract FGTokenCrowdsale is ReentrancyGuard {
         _wallet.transfer(msg.value);
     }
 
-
-
     /**
      * @return the amount of wei raised.
      */
@@ -88,5 +83,4 @@ contract FGTokenCrowdsale is ReentrancyGuard {
     function rate() public view returns (uint256) {
         return _rate;
     }
-
 }

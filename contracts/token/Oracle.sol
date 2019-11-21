@@ -1,9 +1,9 @@
-pragma solidity ^0.5.1;
+pragma solidity 0.5.11;
 
 import "../../vendors/oraclize-api/contracts/oraclize.sol";
 
 contract Oracle is usingProvable {
-    
+
     string public _priceEth;
 
     event LogNewProvableQuery(string description);
@@ -15,7 +15,7 @@ contract Oracle is usingProvable {
         getETHValue();
     }
 
-    function getETHValue() 
+    function getETHValue()
         public
         payable
     {
@@ -26,5 +26,4 @@ contract Oracle is usingProvable {
             provable_query(60, "URL", "json(https://min-api.cryptocompare.com/data/pricemultifull?fsyms=ETH&tsyms=USD).RAW.ETH.USD.HIGHHOUR");
         }
     }
-
 }

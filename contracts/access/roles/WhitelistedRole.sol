@@ -1,4 +1,4 @@
-pragma solidity ^0.5.1;
+pragma solidity 0.5.11;
 
 import "./ComplianceRole.sol";
 
@@ -15,11 +15,6 @@ contract WhitelistedRole is ComplianceRole {
 
     event WhitelistedAdded(address indexed account);
     event WhitelistedRemoved(address indexed account);
-
-    modifier onlyWhitelisted() {
-        require(isWhitelisted(msg.sender), "WhitelistedRole: onlyWhitelisted");
-        _;
-    }
 
     function isWhitelisted(address account) public view returns (bool) {
         return _whitelisteds.has(account);
@@ -46,5 +41,4 @@ contract WhitelistedRole is ComplianceRole {
         _whitelisteds.remove(account);
         emit WhitelistedRemoved(account);
     }
-
 }

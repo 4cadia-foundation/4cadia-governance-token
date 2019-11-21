@@ -1,5 +1,5 @@
 
-// File: @openzeppelin/contracts/math/SafeMath.sol
+// File: @openzeppelin\contracts\math\SafeMath.sol
 
 pragma solidity ^0.5.0;
 
@@ -109,7 +109,7 @@ library SafeMath {
     }
 }
 
-// File: @openzeppelin/contracts/token/ERC20/IERC20.sol
+// File: node_modules\@openzeppelin\contracts\token\ERC20\IERC20.sol
 
 pragma solidity ^0.5.0;
 
@@ -188,7 +188,117 @@ interface IERC20 {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 }
 
-// File: @openzeppelin/contracts/utils/Address.sol
+// File: node_modules\@openzeppelin\contracts\math\SafeMath.sol
+
+pragma solidity ^0.5.0;
+
+/**
+ * @dev Wrappers over Solidity's arithmetic operations with added overflow
+ * checks.
+ *
+ * Arithmetic operations in Solidity wrap on overflow. This can easily result
+ * in bugs, because programmers usually assume that an overflow raises an
+ * error, which is the standard behavior in high level programming languages.
+ * `SafeMath` restores this intuition by reverting the transaction when an
+ * operation overflows.
+ *
+ * Using this library instead of the unchecked operations eliminates an entire
+ * class of bugs, so it's recommended to use it always.
+ */
+library SafeMath {
+    /**
+     * @dev Returns the addition of two unsigned integers, reverting on
+     * overflow.
+     *
+     * Counterpart to Solidity's `+` operator.
+     *
+     * Requirements:
+     * - Addition cannot overflow.
+     */
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        require(c >= a, "SafeMath: addition overflow");
+
+        return c;
+    }
+
+    /**
+     * @dev Returns the subtraction of two unsigned integers, reverting on
+     * overflow (when the result is negative).
+     *
+     * Counterpart to Solidity's `-` operator.
+     *
+     * Requirements:
+     * - Subtraction cannot overflow.
+     */
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        require(b <= a, "SafeMath: subtraction overflow");
+        uint256 c = a - b;
+
+        return c;
+    }
+
+    /**
+     * @dev Returns the multiplication of two unsigned integers, reverting on
+     * overflow.
+     *
+     * Counterpart to Solidity's `*` operator.
+     *
+     * Requirements:
+     * - Multiplication cannot overflow.
+     */
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
+        // benefit is lost if 'b' is also tested.
+        // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
+        if (a == 0) {
+            return 0;
+        }
+
+        uint256 c = a * b;
+        require(c / a == b, "SafeMath: multiplication overflow");
+
+        return c;
+    }
+
+    /**
+     * @dev Returns the integer division of two unsigned integers. Reverts on
+     * division by zero. The result is rounded towards zero.
+     *
+     * Counterpart to Solidity's `/` operator. Note: this function uses a
+     * `revert` opcode (which leaves remaining gas untouched) while Solidity
+     * uses an invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     * - The divisor cannot be zero.
+     */
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        // Solidity only automatically asserts when dividing by 0
+        require(b > 0, "SafeMath: division by zero");
+        uint256 c = a / b;
+        // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+
+        return c;
+    }
+
+    /**
+     * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+     * Reverts when dividing by zero.
+     *
+     * Counterpart to Solidity's `%` operator. This function uses a `revert`
+     * opcode (which leaves remaining gas untouched) while Solidity uses an
+     * invalid opcode to revert (consuming all remaining gas).
+     *
+     * Requirements:
+     * - The divisor cannot be zero.
+     */
+    function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+        require(b != 0, "SafeMath: modulo by zero");
+        return a % b;
+    }
+}
+
+// File: node_modules\@openzeppelin\contracts\utils\Address.sol
 
 pragma solidity ^0.5.0;
 
@@ -218,7 +328,7 @@ library Address {
     }
 }
 
-// File: @openzeppelin/contracts/token/ERC20/SafeERC20.sol
+// File: @openzeppelin\contracts\token\ERC20\SafeERC20.sol
 
 pragma solidity ^0.5.0;
 
@@ -295,7 +405,7 @@ library SafeERC20 {
     }
 }
 
-// File: @openzeppelin/contracts/utils/ReentrancyGuard.sol
+// File: @openzeppelin\contracts\utils\ReentrancyGuard.sol
 
 pragma solidity ^0.5.0;
 
@@ -336,257 +446,7 @@ contract ReentrancyGuard {
     }
 }
 
-// File: @openzeppelin/contracts/crowdsale/Crowdsale.sol
-
-pragma solidity ^0.5.0;
-
-
-
-
-
-/**
- * @title Crowdsale
- * @dev Crowdsale is a base contract for managing a token crowdsale,
- * allowing investors to purchase tokens with ether. This contract implements
- * such functionality in its most fundamental form and can be extended to provide additional
- * functionality and/or custom behavior.
- * The external interface represents the basic interface for purchasing tokens, and conforms
- * the base architecture for crowdsales. It is *not* intended to be modified / overridden.
- * The internal interface conforms the extensible and modifiable surface of crowdsales. Override
- * the methods to add functionality. Consider using 'super' where appropriate to concatenate
- * behavior.
- */
-contract Crowdsale is ReentrancyGuard {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
-
-    // The token being sold
-    IERC20 private _token;
-
-    // Address where funds are collected
-    address payable private _wallet;
-
-    // How many token units a buyer gets per wei.
-    // The rate is the conversion between wei and the smallest and indivisible token unit.
-    // So, if you are using a rate of 1 with a ERC20Detailed token with 3 decimals called TOK
-    // 1 wei will give you 1 unit, or 0.001 TOK.
-    uint256 private _rate;
-
-    // Amount of wei raised
-    uint256 private _weiRaised;
-
-    /**
-     * Event for token purchase logging
-     * @param purchaser who paid for the tokens
-     * @param beneficiary who got the tokens
-     * @param value weis paid for purchase
-     * @param amount amount of tokens purchased
-     */
-    event TokensPurchased(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
-
-    /**
-     * @param rate Number of token units a buyer gets per wei
-     * @dev The rate is the conversion between wei and the smallest and indivisible
-     * token unit. So, if you are using a rate of 1 with a ERC20Detailed token
-     * with 3 decimals called TOK, 1 wei will give you 1 unit, or 0.001 TOK.
-     * @param wallet Address where collected funds will be forwarded to
-     * @param token Address of the token being sold
-     */
-    constructor (uint256 rate, address payable wallet, IERC20 token) public {
-        require(rate > 0, "Crowdsale: rate is 0");
-        require(wallet != address(0), "Crowdsale: wallet is the zero address");
-        require(address(token) != address(0), "Crowdsale: token is the zero address");
-
-        _rate = rate;
-        _wallet = wallet;
-        _token = token;
-    }
-
-    /**
-     * @dev fallback function ***DO NOT OVERRIDE***
-     * Note that other contracts will transfer funds with a base gas stipend
-     * of 2300, which is not enough to call buyTokens. Consider calling
-     * buyTokens directly when purchasing tokens from a contract.
-     */
-    function () external payable {
-        buyTokens(msg.sender);
-    }
-
-    /**
-     * @return the token being sold.
-     */
-    function token() public view returns (IERC20) {
-        return _token;
-    }
-
-    /**
-     * @return the address where funds are collected.
-     */
-    function wallet() public view returns (address payable) {
-        return _wallet;
-    }
-
-    /**
-     * @return the number of token units a buyer gets per wei.
-     */
-    function rate() public view returns (uint256) {
-        return _rate;
-    }
-
-    /**
-     * @return the amount of wei raised.
-     */
-    function weiRaised() public view returns (uint256) {
-        return _weiRaised;
-    }
-
-    /**
-     * @dev low level token purchase ***DO NOT OVERRIDE***
-     * This function has a non-reentrancy guard, so it shouldn't be called by
-     * another `nonReentrant` function.
-     * @param beneficiary Recipient of the token purchase
-     */
-    function buyTokens(address beneficiary) public nonReentrant payable {
-        uint256 weiAmount = msg.value;
-        _preValidatePurchase(beneficiary, weiAmount);
-
-        // calculate token amount to be created
-        uint256 tokens = _getTokenAmount(weiAmount);
-
-        // update state
-        _weiRaised = _weiRaised.add(weiAmount);
-
-        _processPurchase(beneficiary, tokens);
-        emit TokensPurchased(msg.sender, beneficiary, weiAmount, tokens);
-
-        _updatePurchasingState(beneficiary, weiAmount);
-
-        _forwardFunds();
-        _postValidatePurchase(beneficiary, weiAmount);
-    }
-
-    /**
-     * @dev Validation of an incoming purchase. Use require statements to revert state when conditions are not met.
-     * Use `super` in contracts that inherit from Crowdsale to extend their validations.
-     * Example from CappedCrowdsale.sol's _preValidatePurchase method:
-     *     super._preValidatePurchase(beneficiary, weiAmount);
-     *     require(weiRaised().add(weiAmount) <= cap);
-     * @param beneficiary Address performing the token purchase
-     * @param weiAmount Value in wei involved in the purchase
-     */
-    function _preValidatePurchase(address beneficiary, uint256 weiAmount) internal view {
-        require(beneficiary != address(0), "Crowdsale: beneficiary is the zero address");
-        require(weiAmount != 0, "Crowdsale: weiAmount is 0");
-    }
-
-    /**
-     * @dev Validation of an executed purchase. Observe state and use revert statements to undo rollback when valid
-     * conditions are not met.
-     * @param beneficiary Address performing the token purchase
-     * @param weiAmount Value in wei involved in the purchase
-     */
-    function _postValidatePurchase(address beneficiary, uint256 weiAmount) internal view {
-        // solhint-disable-previous-line no-empty-blocks
-    }
-
-    /**
-     * @dev Source of tokens. Override this method to modify the way in which the crowdsale ultimately gets and sends
-     * its tokens.
-     * @param beneficiary Address performing the token purchase
-     * @param tokenAmount Number of tokens to be emitted
-     */
-    function _deliverTokens(address beneficiary, uint256 tokenAmount) internal {
-        _token.safeTransfer(beneficiary, tokenAmount);
-    }
-
-    /**
-     * @dev Executed when a purchase has been validated and is ready to be executed. Doesn't necessarily emit/send
-     * tokens.
-     * @param beneficiary Address receiving the tokens
-     * @param tokenAmount Number of tokens to be purchased
-     */
-    function _processPurchase(address beneficiary, uint256 tokenAmount) internal {
-        _deliverTokens(beneficiary, tokenAmount);
-    }
-
-    /**
-     * @dev Override for extensions that require an internal state to check for validity (current user contributions,
-     * etc.)
-     * @param beneficiary Address receiving the tokens
-     * @param weiAmount Value in wei involved in the purchase
-     */
-    function _updatePurchasingState(address beneficiary, uint256 weiAmount) internal {
-        // solhint-disable-previous-line no-empty-blocks
-    }
-
-    /**
-     * @dev Override to extend the way in which ether is converted to tokens.
-     * @param weiAmount Value in wei to be converted into tokens
-     * @return Number of tokens that can be purchased with the specified _weiAmount
-     */
-    function _getTokenAmount(uint256 weiAmount) internal view returns (uint256) {
-        return weiAmount.mul(_rate);
-    }
-
-    /**
-     * @dev Determines how ETH is stored/forwarded on purchases.
-     */
-    function _forwardFunds() internal {
-        _wallet.transfer(msg.value);
-    }
-}
-
-// File: @openzeppelin/contracts/crowdsale/validation/CappedCrowdsale.sol
-
-pragma solidity ^0.5.0;
-
-
-
-/**
- * @title CappedCrowdsale
- * @dev Crowdsale with a limit for total contributions.
- */
-contract CappedCrowdsale is Crowdsale {
-    using SafeMath for uint256;
-
-    uint256 private _cap;
-
-    /**
-     * @dev Constructor, takes maximum amount of wei accepted in the crowdsale.
-     * @param cap Max amount of wei to be contributed
-     */
-    constructor (uint256 cap) public {
-        require(cap > 0, "CappedCrowdsale: cap is 0");
-        _cap = cap;
-    }
-
-    /**
-     * @return the cap of the crowdsale.
-     */
-    function cap() public view returns (uint256) {
-        return _cap;
-    }
-
-    /**
-     * @dev Checks whether the cap has been reached.
-     * @return Whether the cap was reached
-     */
-    function capReached() public view returns (bool) {
-        return weiRaised() >= _cap;
-    }
-
-    /**
-     * @dev Extend parent behavior requiring purchase to respect the funding cap.
-     * @param beneficiary Token purchaser
-     * @param weiAmount Amount of wei contributed
-     */
-    function _preValidatePurchase(address beneficiary, uint256 weiAmount) internal view {
-        super._preValidatePurchase(beneficiary, weiAmount);
-        require(weiRaised().add(weiAmount) <= _cap, "CappedCrowdsale: cap exceeded");
-    }
-}
-
-// File: @openzeppelin/contracts/token/ERC20/ERC20.sol
+// File: node_modules\@openzeppelin\contracts\token\ERC20\ERC20.sol
 
 pragma solidity ^0.5.0;
 
@@ -816,7 +676,7 @@ contract ERC20 is IERC20 {
     }
 }
 
-// File: @openzeppelin/contracts/access/Roles.sol
+// File: node_modules\@openzeppelin\contracts\access\Roles.sol
 
 pragma solidity ^0.5.0;
 
@@ -855,7 +715,7 @@ library Roles {
     }
 }
 
-// File: @openzeppelin/contracts/access/roles/MinterRole.sol
+// File: node_modules\@openzeppelin\contracts\access\roles\MinterRole.sol
 
 pragma solidity ^0.5.0;
 
@@ -900,7 +760,7 @@ contract MinterRole {
     }
 }
 
-// File: @openzeppelin/contracts/token/ERC20/ERC20Mintable.sol
+// File: @openzeppelin\contracts\token\ERC20\ERC20Mintable.sol
 
 pragma solidity ^0.5.0;
 
@@ -926,159 +786,86 @@ contract ERC20Mintable is ERC20, MinterRole {
     }
 }
 
-// File: @openzeppelin/contracts/crowdsale/emission/MintedCrowdsale.sol
+// File: contracts\token\FGTokenCrowdsale.sol
 
-pragma solidity ^0.5.0;
-
-
+pragma solidity 0.5.11;
 
 /**
- * @title MintedCrowdsale
- * @dev Extension of Crowdsale contract whose tokens are minted in each purchase.
- * Token ownership should be transferred to MintedCrowdsale for minting.
+ * @title Reference implementation of the Crowdsale contract.
  */
-contract MintedCrowdsale is Crowdsale {
-    /**
-     * @dev Overrides delivery by minting tokens upon purchase.
-     * @param beneficiary Token purchaser
-     * @param tokenAmount Number of tokens to be minted
-     */
-    function _deliverTokens(address beneficiary, uint256 tokenAmount) internal {
-        // Potentially dangerous assumption about the type of the token.
-        require(
-            ERC20Mintable(address(token())).mint(beneficiary, tokenAmount),
-                "MintedCrowdsale: minting failed"
-        );
-    }
-}
+contract FGTokenCrowdsale is ReentrancyGuard {
 
-// File: @openzeppelin/contracts/crowdsale/validation/TimedCrowdsale.sol
-
-pragma solidity ^0.5.0;
-
-
-
-/**
- * @title TimedCrowdsale
- * @dev Crowdsale accepting contributions only within a time frame.
- */
-contract TimedCrowdsale is Crowdsale {
     using SafeMath for uint256;
+    using SafeERC20 for IERC20;
 
-    uint256 private _openingTime;
-    uint256 private _closingTime;
+    IERC20 private _token;
 
-    /**
-     * Event for crowdsale extending
-     * @param newClosingTime new closing time
-     * @param prevClosingTime old closing time
-     */
-    event TimedCrowdsaleExtended(uint256 prevClosingTime, uint256 newClosingTime);
+    uint256 private _rate;
+    uint256 private _sellingRate;
 
-    /**
-     * @dev Reverts if not in crowdsale time range.
-     */
-    modifier onlyWhileOpen {
-        require(isOpen(), "TimedCrowdsale: not open");
-        _;
-    }
+    uint256 private _weiRaised;
+
+    address payable private _wallet;
 
     /**
-     * @dev Constructor, takes crowdsale opening and closing times.
-     * @param openingTime Crowdsale opening time
-     * @param closingTime Crowdsale closing time
+     * Event for token purchase logging
+     * @param purchaser who paid for the tokens
+     * @param beneficiary who got the tokens
+     * @param value weis paid for purchase
+     * @param amount amount of tokens purchased
      */
-    constructor (uint256 openingTime, uint256 closingTime) public {
-        // solhint-disable-next-line not-rely-on-time
-        require(openingTime >= block.timestamp, "TimedCrowdsale: opening time is before current time");
-        // solhint-disable-next-line max-line-length
-        require(closingTime > openingTime, "TimedCrowdsale: opening time is not before closing time");
-
-        _openingTime = openingTime;
-        _closingTime = closingTime;
-    }
-
-    /**
-     * @return the crowdsale opening time.
-     */
-    function openingTime() public view returns (uint256) {
-        return _openingTime;
-    }
-
-    /**
-     * @return the crowdsale closing time.
-     */
-    function closingTime() public view returns (uint256) {
-        return _closingTime;
-    }
-
-    /**
-     * @return true if the crowdsale is open, false otherwise.
-     */
-    function isOpen() public view returns (bool) {
-        // solhint-disable-next-line not-rely-on-time
-        return block.timestamp >= _openingTime && block.timestamp <= _closingTime;
-    }
-
-    /**
-     * @dev Checks whether the period in which the crowdsale is open has already elapsed.
-     * @return Whether crowdsale period has elapsed
-     */
-    function hasClosed() public view returns (bool) {
-        // solhint-disable-next-line not-rely-on-time
-        return block.timestamp > _closingTime;
-    }
-
-    /**
-     * @dev Extend parent behavior requiring to be within contributing period.
-     * @param beneficiary Token purchaser
-     * @param weiAmount Amount of wei contributed
-     */
-    function _preValidatePurchase(address beneficiary, uint256 weiAmount) internal onlyWhileOpen view {
-        super._preValidatePurchase(beneficiary, weiAmount);
-    }
-
-    /**
-     * @dev Extend crowdsale.
-     * @param newClosingTime Crowdsale closing time
-     */
-    function _extendTime(uint256 newClosingTime) internal {
-        require(!hasClosed(), "TimedCrowdsale: already closed");
-        // solhint-disable-next-line max-line-length
-        require(newClosingTime > _closingTime, "TimedCrowdsale: new closing time is before current closing time");
-
-        emit TimedCrowdsaleExtended(_closingTime, newClosingTime);
-        _closingTime = newClosingTime;
-    }
-}
-
-// File: contracts/token/FGTokenCrowdsale.sol
-
-pragma solidity ^0.5.1;
-
-
-
-
-
-
-contract FGTokenCrowdsale is CappedCrowdsale, MintedCrowdsale, TimedCrowdsale {
-
+    event TokensPurchased(address indexed purchaser, address indexed beneficiary, uint256 value, uint256 amount);
 
     constructor (
-        uint256 openingTime,
-        uint256 closingTime,
         uint256 rate,
-        uint256 cap,
         address payable wallet,
         ERC20Mintable token
     )
         public
-        Crowdsale(rate, wallet, token)
-        CappedCrowdsale(cap)
-        TimedCrowdsale(openingTime, closingTime)
     {
-
+        _wallet = wallet;
+        _token = token;
+        _rate = rate;
     }
 
+    function () external payable {
+        buyTokens(msg.sender);
+    }
 
+    function buyTokens(address beneficiary) public nonReentrant payable {
+        require(beneficiary != address(0), "Crowdsale: beneficiary is the zero address");
+        require(msg.value != 0, "Crowdsale: weiAmount is 0");
+
+        uint256 weiAmount = msg.value;
+        uint256 sellingRate = 184.0;
+
+        uint256 amountWithRate = weiAmount * sellingRate;
+        uint256 tokenConversion = amountWithRate.div(10**10);
+        uint256 tokens = tokenConversion * _rate;
+
+        if (tokens < 1)
+            revert("Operation balance cannot be less than one token");
+
+        _weiRaised = _weiRaised.add(weiAmount);
+
+        _token.safeTransfer(beneficiary, tokens);
+
+        emit TokensPurchased(msg.sender, beneficiary, weiAmount, tokens);
+
+        _wallet.transfer(msg.value);
+    }
+
+    /**
+     * @return the amount of wei raised.
+     */
+    function weiRaised() public view returns (uint256) {
+        return _weiRaised;
+    }
+
+    /**
+     * @return the number of token units a buyer gets per wei.
+     */
+    function rate() public view returns (uint256) {
+        return _rate;
+    }
 }

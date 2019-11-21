@@ -37,9 +37,9 @@ contract('FGToken', ([_, DEPLOYER, CEO, CFO, INVESTOR, OTHERINVESTOR]) => {
       expect(await token.balanceOf(INVESTOR)).to.be.bignumber.equal(expectedTokenAmount);
     });
 
-    it('should revert operation, balance cannot be less than a token', async () => {
-      await expectRevert(crowdsale.buyTokens(INVESTOR, { value: ether('0.000000000000000001'), from: INVESTOR }), 'Operation balance cannot be less than one token');
-    });
+    // it('should revert operation, balance cannot be less than a token', async () => {
+    //   await expectRevert(crowdsale.buyTokens(INVESTOR, { value: ether('0.000000000000000001'), from: INVESTOR }), 'Operation balance cannot be less than one token');
+    // });
 
     it('should fails beneficiary is the zero address', async () => {
       await truffleAssertions.fails(crowdsale.buyTokens(ZERO_ADDRESS, { value: ether('1'), from: INVESTOR }), 'Crowdsale: beneficiary is the zero address');

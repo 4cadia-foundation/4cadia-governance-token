@@ -5,10 +5,23 @@ import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
 
+
+contract Oracle {
+
+    function __callback(bytes32 _myid, string memory _result) public {}
+
+    function getETHValue() public payable{}
+
+    function priceEth() public view returns(uint256) {}
+
+    function datetimePrice() public view returns (uint256){}
+}
+
+
 /**
  * @title Reference implementation of the Crowdsale contract.
  */
-contract FGTokenCrowdsale is ReentrancyGuard {
+contract FGTokenPreSale is ReentrancyGuard {
 
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
@@ -17,8 +30,8 @@ contract FGTokenCrowdsale is ReentrancyGuard {
     IERC20 private _token;
 
     uint256 private _rate;
-    uint256 private _sellingRate;
 
+    address public _oracleAddress;
 
     uint256 private _weiRaised;
 
@@ -36,29 +49,32 @@ contract FGTokenCrowdsale is ReentrancyGuard {
     constructor (
         uint256 rate,
         address payable wallet,
-        ERC20Mintable token
+        ERC20Mintable token,
+        address oracleAddress
     )
         public
     {
         _wallet = wallet;
         _token = token;
         _rate = rate;
+        _oracleAddress = oracleAddress;
     }
 
     function () external payable {
         buyTokens(msg.sender);
     }
 
-
     function buyTokens(address beneficiary) public nonReentrant payable {
-        require(beneficiary != address(0), "Crowdsale: beneficiary is the zero address");
-        require(msg.value != 0, "Crowdsale: weiAmount is 0");
+        require(beneficiary != address(0), "Pre-Sale: beneficiary is the zero address");
+        require(msg.value != 0, "Pre-Sale: weiAmount is 0");
 
         uint256 weiAmount = msg.value;
-        uint256 sellingRate = 184.0;
+        uint256 sellingRate = priceEth();
 
-        uint256 amountWithRate = weiAmount * sellingRate;
-        uint256 tokenConversion = amountWithRate.div(10**10);
+        uint256 amountWithRate = weiAmount.mul(sellingRate);
+        amountWithRate = amountWithRate.div(100);
+
+        uint256 tokenConversion = amountWithRate.div(1e10);
         uint256 tokens = tokenConversion * _rate;
 
         if (tokens < 1)
@@ -72,7 +88,15 @@ contract FGTokenCrowdsale is ReentrancyGuard {
 
         _wallet.transfer(msg.value);
     }
+    
 
+    /**
+     * @return the price of ether
+     */
+    function priceEth() public view returns(uint256) {
+        Oracle oracle = Oracle(_oracleAddress);
+        return oracle.priceEth();
+    }
 
 
     /**

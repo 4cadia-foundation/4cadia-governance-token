@@ -1,5 +1,6 @@
 const FGToken = artifacts.require('FGToken');
-const FGTokenCrowdsale = artifacts.require('FGTokenCrowdsale');
+const FGTokenPreSale = artifacts.require('FGTokenPreSale');
+const Oracle = artifacts.require('Oracle');
 
 module.exports = async (deployer, network, accounts) => {
 
@@ -8,9 +9,10 @@ module.exports = async (deployer, network, accounts) => {
   const decimals = 8;
   const maxCap = 1000 * 10 ** decimals;
   const rate = 1;
-  const wallet = '0x2aca7f45a401cdd40ac745248272270095f69ba4';
+  const walletCFO = '0x2aca7f45a401cdd40ac745248272270095f69ba4';
   const forecastDuration = 7;
 
   await deployer.deploy(FGToken, name, symbol, decimals, maxCap, forecastDuration);
-  await deployer.deploy(FGTokenCrowdsale, rate, wallet, FGToken.address);
+  await deployer.deploy(Oracle);
+  await deployer.deploy(FGTokenPreSale, rate, walletCFO, FGToken.address, Oracle.address);
 };
